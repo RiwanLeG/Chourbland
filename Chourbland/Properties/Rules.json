@@ -1,0 +1,11 @@
+{
+    "smell": {
+        "danger": "monster"
+    },
+    "wind": {
+        "danger": "cliff"
+    },
+    "shine": {
+        "goal": "portal"
+    }
+}
