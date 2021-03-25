@@ -6,6 +6,10 @@
         "danger": "cliff"
     },
     "shine": {
+        "danger": "none",
         "goal": "portal"
+    },
+    "nothing": {
+        "danger":  "none"
     }
 }
