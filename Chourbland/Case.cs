@@ -28,7 +28,6 @@ namespace Chourbland
 
         }
 
-
         public void Set_Monster(float a_monster) {
             monster = a_monster;
             Update_Image();
