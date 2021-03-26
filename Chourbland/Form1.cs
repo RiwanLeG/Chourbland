@@ -224,9 +224,6 @@ namespace Chourbland
 
         private void Form1_Load(object sender, EventArgs e)
         {
-
-            Agent agent = new Agent();
-            agent.Load_Json();
         }
     }
 }
