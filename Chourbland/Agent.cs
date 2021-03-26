@@ -8,7 +8,6 @@ namespace Chourbland
 {
     public class Agent
     {
-
         // Percepts - liste des capteurs de l'agent
         public List<String> percepts = new List<String>(new string[] { "smell", "wind", "shine" });
 
@@ -26,6 +25,23 @@ namespace Chourbland
 
         public int performance_indicator = 0;
 
+        public Agent(int length, int width, Case initialposition,Tuple<int, int> initialPos)
+        {
+            this.pos_agent = initialPos;
+            beliefs = new Case[length, width];
+            for (int column = 0; column < width; column++)
+            {
+                for (int row = 0; row < length; row++)
+                {
+                    Case new_case = new Case();
+                    beliefs[column, row] = new_case;
+                }
+            }
+
+            beliefs[this.pos_agent.Item1, this.pos_agent.Item1] = initialposition;
+            Console.WriteLine("I'm aliiiiiive");
+        }
+
         public void Shoot_rock(Tuple<int, int> target_pos)
         {
             /*            if element on the cell == "monster"
@@ -33,25 +49,44 @@ namespace Chourbland
             */
         }
 
-        public List<Case> Update_all_unknown_adjacent_cases(Tuple<int, int> current_case_pos, Case[,] current_grid, string field, float value)
+        public void Update_all_unknown_adjacent_cases(Tuple<int, int> currentCasePos, Case[,] currentGrid, string field, float value)
         {
-            List<Case> Unknown_adjacent_cases = new List<Case>();
-            int x = current_case_pos.Item1;
-            int y = current_case_pos.Item2;
+            int x = currentCasePos.Item1;
+            int y = currentCasePos.Item2;
             for (int dx = -1; dx <= 1; ++dx)
             {
                 for (int dy = -1; dy <= 1; ++dy)
                 {
-                    Case candidate = current_grid[x + dx,y + dy];
-                    if ((dx != 0 && dy == 0) || (dx == 0 && dy != 0) && candidate.visited)
+                    int xdx = x + dx;
+                    int ydy = y + dy;
+                    //On vérifie bien qu'on ne sort pas de la grille
+                    if ((xdx < 0) || (xdx > currentGrid.GetLength(0)) || (ydy < 0) ||
+                        (ydy > currentGrid.GetLength(1)))
                     {
-                        candidate.GetType().GetProperty(field).SetValue(candidate, value, null);
+                        continue;
+                    }
+                    Case candidate = currentGrid[xdx,ydy];
+                    if ((dx != 0 && dy == 0) || (dx == 0 && dy != 0) && !candidate.Get_Visited())
+                    {
+                        Console.WriteLine("Case(" + xdx + "," + ydy + "): monster:" + candidate.Get_Monster() + "; cliff:" + candidate.Get_Cliff() + "; portal:" + candidate.Get_Portal());
+                        if (field == "monster")
+                        {
+                            candidate.Set_Monster(value);
+                        }
+                        if (field == "cliff")
+                        {
+                            candidate.Set_Cliff(value);
+                        }
+                        if (field == "portal")
+                        {
+                            candidate.Set_Portal(value);
+                        }
+                        Console.WriteLine("then Case("+xdx+","+ydy+"): monster:"+candidate.Get_Monster()+"; cliff:"+candidate.Get_Cliff()+"; portal:"+candidate.Get_Portal());
                     }
                 }
             }
-            return Unknown_adjacent_cases;
         }
-        public static Tuple<int, int> CoordinatesOf( Case[,] grid, Case candidiate)
+        public static Tuple<int, int> CoordinatesOf( Case[,] grid, Case box)
         {
             int w = grid.GetLength(0); // width
             int h = grid.GetLength(1); // height
@@ -60,59 +95,59 @@ namespace Chourbland
             {
                 for (int y = 0; y < h; ++y)
                 {
-                    if (grid[x, y].Equals(candidiate))
+                    if (grid[x, y].Equals(box))
                         return Tuple.Create(x, y);
                 }
             }
 
             return Tuple.Create(-1, -1);
         }
-        public void Forward_chaining(Case[,] currentBeliefs)
+        public void Forward_chaining()
         {
-            foreach (Case candidate in currentBeliefs)
+            Console.WriteLine("Forward chaining");
+            var x = this.pos_agent.Item1;
+            var y = this.pos_agent.Item2;
+            var currentCase = this.beliefs[x, y];
+            Console.WriteLine("Case actuelle : "+x+" "+y);
+            if (currentCase.Get_Smell())
             {
-                //var neighbors = Get_all_unknown_adjacent_cases(candidate, currentBeliefs)
-                Tuple<int, int> candidate_pos = CoordinatesOf(currentBeliefs, candidate);
-                //Si une case sent mauvaise,alors il y a peut-être un monstre dans les cases adjacentes non-visitées
-                if (candidate.smell)
-                {
-                    Update_all_unknown_adjacent_cases(candidate_pos, currentBeliefs, "monster", 1f);
-                }
-                //Si une case sent mauvaise,alors il y a peut-être une falaise dans les cases adjacentes non-visitées
-                if (candidate.wind)
-                {
-                    Update_all_unknown_adjacent_cases(candidate_pos, currentBeliefs, "cleaf", 1f);
-                }
-                //Si une case sent mauvaise,alors il y a le portail dans l'une des cases adjacentes non-visitées
-                if (candidate.sun)
-                {
-                    Update_all_unknown_adjacent_cases(candidate_pos, currentBeliefs, "portal", 1f);
-                    Update_all_unknown_adjacent_cases(candidate_pos, currentBeliefs, "monster", 0f);
-                    Update_all_unknown_adjacent_cases(candidate_pos, currentBeliefs, "cleaf", 0f);
-                }
+                Console.WriteLine("There is a monster nearby");
+                Update_all_unknown_adjacent_cases(this.pos_agent, this.beliefs, "monster", 1f);
+            }
+            if (currentCase.Get_Wind())
+            {
+                Console.WriteLine("There is a cliff nearby");
+                Update_all_unknown_adjacent_cases(this.pos_agent, this.beliefs, "cliff", 1f);
+            }
+            if (currentCase.Get_Light())
+            {
+                Console.WriteLine("There is a portal nearby");
+                Update_all_unknown_adjacent_cases(this.pos_agent, this.beliefs, "portal", 1f);
+                Update_all_unknown_adjacent_cases(this.pos_agent, this.beliefs, "monster", 0f);
+                Update_all_unknown_adjacent_cases(this.pos_agent, this.beliefs, "cliff", 0f);
             }
         }
 
-        public Tuple<int, int> Move_agent()
-        {
-            foreach case in cases:
-            {
-                float safest = 1.0f;
-                if (Case.border == true)
-                {
-                    if (Case.monster < safest)
-                    {
-                        safest = Case.monster;
-                        //next_pos_agent = pos_case;
-                        if (Case.cliff < safest)
-                        {
-                            safest = Case.cliff;
-                            //next_pos_agent = pos_case;
-                        }
-                    }
-                } //else random between borders                
-            }
-            return next_pos_agent;
-        }
+        //public Tuple<int, int> Move_agent()
+        //{
+        //    foreach(case in cases):
+        //    {
+        //        float safest = 1.0f;
+        //        if (Case.border == true)
+        //        {
+        //            if (Case.monster < safest)
+        //            {
+        //                safest = Case.monster;
+        //                //next_pos_agent = pos_case;
+        //                if (Case.cliff < safest)
+        //                {
+        //                    safest = Case.cliff;
+        //                    //next_pos_agent = pos_case;
+        //                }
+        //            }
+        //        } //else random between borders                
+        //    }
+        //    return next_pos_agent;
+        //}
     }
 }
