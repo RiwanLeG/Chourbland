@@ -93,7 +93,26 @@ namespace Chourbland
             }
         }
 
-
+        public Tuple<int, int> Move_agent()
+        {
+            foreach case in cases:
+            {
+                float safest = 1.0f;
+                if (Case.border == true)
+                {
+                    if (Case.monster < safest)
+                    {
+                        safest = Case.monster;
+                        //next_pos_agent = pos_case;
+                        if (Case.cliff < safest)
+                        {
+                            safest = Case.cliff;
+                            //next_pos_agent = pos_case;
+                        }
+                    }
+                } //else random between borders                
+            }
+            return next_pos_agent;
+        }
     }
-
 }

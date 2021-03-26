@@ -13,8 +13,9 @@ namespace Chourbland
     public partial class Form1 : Form
     {
         // Tableau de toutes les entrées
-        String[,] cases = new string[5, 5];
-        /*List<float>[,] cases = new List<float>[5, 5];*/
+        /*String[,] cases = new string[5, 5];*/
+
+        Case[,] cases = new Case[5, 5];
         // Nombre de ligne de la grille
         int line_number = 0;
 
@@ -27,6 +28,19 @@ namespace Chourbland
         public Form1()
         {
             InitializeComponent();
+        }
+
+        public void Initialize_Tab_Case()
+        {
+            // Initialisation des cellules du tableau
+            for (int column = 0; column < 5; column++)
+            {
+                for (int row = 0; row < 5; row++)
+                {
+                    Case new_case = new Case();
+                    cases[column, row] = new_case;
+                }
+            }
         }
 
         public void Draw_Grid()
@@ -50,7 +64,7 @@ namespace Chourbland
             float y = 0f;
 
             // Taille des case
-            float size = (float)(100/line_number);
+            float size = (float)(100/cases.GetLength(0));
 
             // lignes verticales
             /*for (int i = 0; i < line_number; i++)*/
@@ -74,7 +88,7 @@ namespace Chourbland
             {
                 for (int n = 0; n < cases.GetLength(1) - 1; n++)
                 {
-                    graphic.DrawString(cases[k, n][0].ToString(), font, Brushes.Black, k * size, n * size);
+                    graphic.DrawString(cases[k, n].image.ToString(), font, Brushes.Black, k * size, n * size);
                 }
             }
 
@@ -84,6 +98,10 @@ namespace Chourbland
         {
             line_number = cases.GetLength(0);
             // Génération aléatoirement du portail
+
+            // Initialisation du tableau
+            Initialize_Tab_Case();
+
             Tuple<int,int> portal_position = Generate_Portal();
 
             Console.WriteLine("portal_position : " + portal_position);
@@ -95,7 +113,7 @@ namespace Chourbland
                 {
                     if((portal_position.Item1 != k) && (portal_position.Item2 != n)) {
                         Console.WriteLine("Un Monstre " + k + " " + n);
-                        Generate_Monster_Or_Cleaf(k,n);
+                        Generate_Monster_Or_Cliff(k,n);
                     }
                 }
             }
@@ -104,9 +122,8 @@ namespace Chourbland
         }
 
 
-
         // Génération d'éléments pour chacune des cases
-        private void Generate_Monster_Or_Cleaf(int new_x, int new_y)
+        private void Generate_Monster_Or_Cliff(int new_x, int new_y)
         {
 
             int index_random_object_type = random.Next(100);
@@ -114,44 +131,52 @@ namespace Chourbland
             String type_object = " ";
 
 
+
             // 20% de chance -> colline
             if (index_random_object_type <= 20)
             {
-                type_object = "cleaf";
-                type_object = "monster";
+                type_object = "cliff";
+                cases[new_x, new_y].Set_Cliff(1.0f);
                 if (new_x > 0)
-                    cases[new_x - 1, new_y] = "wind";
+                    cases[new_x - 1, new_y].Set_Wind(true);
                 if (new_y > 0)
-                    cases[new_x, new_y - 1] = "wind";
+                    cases[new_x, new_y - 1].Set_Wind(true);
                 if (new_y < cases.GetLength(1))
-                    cases[new_x + 1, new_y] = "wind";
+                    cases[new_x + 1, new_y].Set_Wind(true);
                 if (new_y < cases.GetLength(0))
-                    cases[new_x, new_y + 1] = "wind";
+                    cases[new_x, new_y + 1].Set_Wind(true);
             }
             // 20 % de chance->monster
             else if ((index_random_object_type >= 20) && (index_random_object_type <= 40))
             {
                 type_object = "monster";
-                if(new_x > 0)
-                    cases[new_x - 1, new_y] = "smell";
+                cases[new_x, new_y].Set_Monster(1.0f);
+                if (new_x > 0)
+                    cases[new_x - 1, new_y].Set_Smell(true);
                 if(new_y > 0)
-                    cases[new_x, new_y-1] = "smell";
+                    cases[new_x, new_y-1].Set_Smell(true);
                 if (new_y < cases.GetLength(1))
-                    cases[new_x + 1, new_y] = "smell";
+                    cases[new_x + 1, new_y].Set_Smell(true);
                 if (new_y < cases.GetLength(0))
-                    cases[new_x, new_y+1] = "smell";
+                    cases[new_x, new_y+1].Set_Smell(true);
             }
-            // Pas d'objet à affecter à la case
-            cases[new_x, new_y] = type_object;
-/*            Element new_element = new Element(Tuple.Create(new_x, new_y), type_object);
-            elements.Add(new_element);*/
         }
 
         public Tuple<int,int> Generate_Portal()
         {
             int portal_x = random.Next(line_number - 1);
             int portal_y = random.Next(line_number - 1);
-            cases[portal_x, portal_y] = "portal";
+            cases[portal_x, portal_y].Set_Portal(1.0f);
+
+            if (portal_x > 0)
+                cases[portal_x - 1, portal_y].Set_Light(true);
+            if (portal_y > 0)
+                cases[portal_x, portal_y - 1].Set_Light(true);
+            if (portal_y < cases.GetLength(1))
+                cases[portal_x + 1, portal_y].Set_Light(true);
+            if (portal_y < cases.GetLength(0))
+                cases[portal_x, portal_y + 1].Set_Light(true);
+
             return Tuple.Create(portal_x,portal_y);
         }
 
@@ -185,7 +210,13 @@ namespace Chourbland
 
         private void button2_Click(object sender, EventArgs e)
         {
-            Console.WriteLine("Nombre d'élément : " + elements.Count);
+
+            Console.WriteLine("cases " + cases[3,2].image );
+        }
+
+        private void grid_Paint(object sender, PaintEventArgs e)
+        {
+
         }
 
         private void Form1_Load(object sender, EventArgs e)
