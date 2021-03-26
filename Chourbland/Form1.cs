@@ -180,15 +180,15 @@ namespace Chourbland
             return Tuple.Create(portal_x,portal_y);
         }
 
-        public void Display_Grid()
+        private void Display_Grid(Case[,] a_cases)
         {
 
             // Pour chaque case : on génère ou non un élément
-            for (int k = 0; k < cases.GetLength(0); k++)
+            for (int k = 0; k < a_cases.GetLength(0); k++)
             {
-                for (int n = 0; n < cases.GetLength(1); n++)
+                for (int n = 0; n < a_cases.GetLength(1); n++)
                 {
-                    Console.Write(cases[k, n] + " ");
+                    Console.Write(a_cases[k, n] + " ");
                 }
                 Console.WriteLine("");
             }
@@ -200,12 +200,12 @@ namespace Chourbland
         {
             // On passe en paramètre le tableau et on le dessine
             Console.WriteLine("before");
-            Display_Grid();
+            Display_Grid(cases);
 
             Create_Grid();
 
             Console.WriteLine("after");
-            Display_Grid();
+            Display_Grid(cases);
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -225,6 +225,8 @@ namespace Chourbland
         private void Form1_Load(object sender, EventArgs e)
         {
 
+            Agent agent = new Agent();
+            agent.Load_Json();
         }
     }
 }

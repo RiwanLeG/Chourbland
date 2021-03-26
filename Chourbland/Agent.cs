@@ -4,6 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using System.IO;
+
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.Reflection;
+
 namespace Chourbland
 {
     public class Agent
@@ -128,26 +134,68 @@ namespace Chourbland
             }
         }
 
-        //public Tuple<int, int> Move_agent()
-        //{
-        //    foreach(case in cases):
-        //    {
-        //        float safest = 1.0f;
-        //        if (Case.border == true)
-        //        {
-        //            if (Case.monster < safest)
-        //            {
-        //                safest = Case.monster;
-        //                //next_pos_agent = pos_case;
-        //                if (Case.cliff < safest)
-        //                {
-        //                    safest = Case.cliff;
-        //                    //next_pos_agent = pos_case;
-        //                }
-        //            }
-        //        } //else random between borders                
-        //    }
-        //    return next_pos_agent;
-        //}
+        public Tuple<int,int> Move_agent()
+        {
+            Tuple<int,int> next_pos_agent = new Tuple<int, int> (0,0);
+            float safest = 1.0f;
+            foreach (Case box in beliefs)
+            {
+                
+                if (box.Get_border() == true)
+                {
+                    if (box.Get_Monster() < safest)
+                    {
+                        safest = box.Get_Monster();
+                        next_pos_agent = CoordinatesOf(beliefs, box);
+                        
+                    }
+                    else if (box.Get_Cliff() < safest)
+                    {
+                        safest = box.Get_Cliff();
+                        next_pos_agent = CoordinatesOf(beliefs, box);
+                    }
+                } //else random between borders                
+            }
+
+            List<Case> Unknown_adjacent_cases = new List<Case>();
+            int x = next_pos_agent.Item1;
+            int y = next_pos_agent.Item2;
+            for (int dx = -1; dx <= 1; ++dx)
+            {
+                for (int dy = -1; dy <= 1; ++dy)
+                {
+                    Case candidate = beliefs[x + dx, y + dy];
+                    if ((dx != 0 && dy == 0) || (dx == 0 && dy != 0) && !candidate.Get_Visited())
+                    {
+                        candidate.Set_border(true);
+                    }
+                }
+            }
+            return next_pos_agent;
+        }
+
+
+        // Fonction pour lire le JSON
+
+        public void Load_Json()
+        {
+
+            string project_location = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+
+            string path = project_location + @"\..\..\Rules.json";
+
+            Console.WriteLine("path : " + path);
+            // read JSON directly from a file
+            using (StreamReader file = File.OpenText(path))
+            using (JsonTextReader reader = new JsonTextReader(file))
+            {
+                JObject o2 = (JObject)JToken.ReadFrom(reader);
+                foreach (var element in o2)
+                {
+                    Console.WriteLine("if : " + element.Key);
+                    Console.WriteLine("else : " + element.Value["danger"].ToString());
+                }
+            }
+        }
     }
 }
