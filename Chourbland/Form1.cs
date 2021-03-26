@@ -88,7 +88,7 @@ namespace Chourbland
             {
                 for (int n = 0; n < cases.GetLength(1) - 1; n++)
                 {
-                    graphic.DrawString(cases[k, n].image.ToString(), font, Brushes.Black, k * size, n * size);
+                    graphic.DrawString(cases[k, n].Image.ToString(), font, Brushes.Black, k * size, n * size);
                 }
             }
 
@@ -211,7 +211,7 @@ namespace Chourbland
         private void button2_Click(object sender, EventArgs e)
         {
 
-            Console.WriteLine("cases " + cases[3,2].image );
+            Console.WriteLine("cases " + cases[3,2].Image );
         }
 
         private void grid_Paint(object sender, PaintEventArgs e)
