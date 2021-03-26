@@ -8,6 +8,7 @@ using System.IO;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Reflection;
 
 namespace Chourbland
 {
@@ -143,9 +144,14 @@ namespace Chourbland
 
         public void Load_Json()
         {
+
+            string project_location = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+
+            string path = project_location + @"\..\..\Rules.json";
+
+            Console.WriteLine("path : " + path);
             // read JSON directly from a file
-            // @"c:\Users\riwan\Desktop\UQAC\Trimestre 1\Intelligence artificielle\Travail 3\Chourbland\Rules.json"
-            using (StreamReader file = File.OpenText(@"c:\Users\riwan\Desktop\UQAC\Trimestre 1\Intelligence artificielle\Travail 3\Chourbland\Rules.json"))
+            using (StreamReader file = File.OpenText(path))
             using (JsonTextReader reader = new JsonTextReader(file))
             {
                 JObject o2 = (JObject)JToken.ReadFrom(reader);
@@ -156,6 +162,5 @@ namespace Chourbland
                 }
             }
         }
-
     }
 }
