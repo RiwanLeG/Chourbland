@@ -43,7 +43,7 @@ namespace Chourbland
                 for (int dy = -1; dy <= 1; ++dy)
                 {
                     Case candidate = current_grid[x + dx,y + dy];
-                    if ((dx != 0 && dy == 0) || (dx == 0 && dy != 0) && candidate.visited)
+                    if ((dx != 0 && dy == 0) || (dx == 0 && dy != 0) && !candidate.Get_Visited())
                     {
                         candidate.GetType().GetProperty(field).SetValue(candidate, value, null);
                     }
@@ -74,21 +74,21 @@ namespace Chourbland
                 //var neighbors = Get_all_unknown_adjacent_cases(candidate, currentBeliefs)
                 Tuple<int, int> candidate_pos = CoordinatesOf(currentBeliefs, candidate);
                 //Si une case sent mauvaise,alors il y a peut-être un monstre dans les cases adjacentes non-visitées
-                if (candidate.smell)
+                if (candidate.Get_Smell())
                 {
                     Update_all_unknown_adjacent_cases(candidate_pos, currentBeliefs, "monster", 1f);
                 }
                 //Si une case sent mauvaise,alors il y a peut-être une falaise dans les cases adjacentes non-visitées
-                if (candidate.wind)
+                if (candidate.Get_Wind())
                 {
-                    Update_all_unknown_adjacent_cases(candidate_pos, currentBeliefs, "cleaf", 1f);
+                    Update_all_unknown_adjacent_cases(candidate_pos, currentBeliefs, "cliff", 1f);
                 }
                 //Si une case sent mauvaise,alors il y a le portail dans l'une des cases adjacentes non-visitées
-                if (candidate.sun)
+                if (candidate.Get_Light())
                 {
                     Update_all_unknown_adjacent_cases(candidate_pos, currentBeliefs, "portal", 1f);
                     Update_all_unknown_adjacent_cases(candidate_pos, currentBeliefs, "monster", 0f);
-                    Update_all_unknown_adjacent_cases(candidate_pos, currentBeliefs, "cleaf", 0f);
+                    Update_all_unknown_adjacent_cases(candidate_pos, currentBeliefs, "cliff", 0f);
                 }
             }
         }
@@ -96,9 +96,10 @@ namespace Chourbland
         public Tuple<int,int> Move_agent()
         {
             Tuple<int,int> next_pos_agent = new Tuple<int, int> (0,0);
+            float safest = 1.0f;
             foreach (Case box in beliefs)
             {
-                float safest = 1.0f;
+                
                 if (box.Get_border() == true)
                 {
                     if (box.Get_Monster() < safest)
@@ -113,6 +114,21 @@ namespace Chourbland
                         next_pos_agent = CoordinatesOf(beliefs, box);
                     }
                 } //else random between borders                
+            }
+
+            List<Case> Unknown_adjacent_cases = new List<Case>();
+            int x = next_pos_agent.Item1;
+            int y = next_pos_agent.Item2;
+            for (int dx = -1; dx <= 1; ++dx)
+            {
+                for (int dy = -1; dy <= 1; ++dy)
+                {
+                    Case candidate = beliefs[x + dx, y + dy];
+                    if ((dx != 0 && dy == 0) || (dx == 0 && dy != 0) && !candidate.Get_Visited())
+                    {
+                        candidate.Set_border(true);
+                    }
+                }
             }
             return next_pos_agent;
         }
