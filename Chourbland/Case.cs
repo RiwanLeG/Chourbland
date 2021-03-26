@@ -6,17 +6,17 @@ using System.Threading.Tasks;
 
 namespace Chourbland
 {
-    class Case
+    public class Case
     {
-        float monster = 0f;
-        bool smell = false;
+        public float monster = 0f;
+        public bool smell = false;
 
-        float cleaf = 0f;
-        bool wind = false;
-        
-        float portal = 0f;
-        bool sun = false;
+        public float cleaf = 0f;
+        public bool wind = false;
 
-        bool visited = false;
+        public float portal = 0f;
+        public bool sun = false;
+
+        public bool visited = false;
     }
 }
