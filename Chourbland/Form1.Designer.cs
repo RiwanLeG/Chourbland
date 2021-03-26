@@ -50,6 +50,7 @@ namespace Chourbland
             this.grid.Name = "grid";
             this.grid.Size = new System.Drawing.Size(396, 283);
             this.grid.TabIndex = 1;
+            this.grid.Paint += new System.Windows.Forms.PaintEventHandler(this.grid_Paint);
             // 
             // button2
             // 
