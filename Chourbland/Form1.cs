@@ -187,5 +187,10 @@ namespace Chourbland
         {
             Console.WriteLine("Nombre d'élément : " + elements.Count);
         }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }
