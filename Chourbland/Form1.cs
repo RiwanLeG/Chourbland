@@ -137,7 +137,7 @@ namespace Chourbland
             if (index_random_object_type <= 20)
             {
                 type_object = "cleaf";
-                cases[new_x, new_y].Set_Cleaf(1.0f);
+                cases[new_x, new_y].Set_Cliff(1.0f);
                 if (new_x > 0)
                     cases[new_x - 1, new_y].Set_Wind(true);
                 if (new_y > 0)

@@ -11,7 +11,7 @@ namespace Chourbland
         private float monster = 0f;
         private bool smell = false;
 
-        private float cleaf = 0f;
+        private float cliff = 0f;
         private bool wind = false;
 
         private float portal = 0f;
@@ -26,14 +26,13 @@ namespace Chourbland
 
         }
 
-
         public void Set_Monster(float a_monster) {
             monster = a_monster;
             Update_Image();
         }
 
-        public void Set_Cleaf(float a_cleaf) {
-            cleaf = a_cleaf;
+        public void Set_Cliff(float a_cleaf) {
+            cliff = a_cleaf;
             Update_Image();
         }
         public void Set_Portal(float a_portal) {
@@ -60,7 +59,7 @@ namespace Chourbland
             {
                 image = "m";
             }
-            else if (cleaf == 1.0f)
+            else if (cliff == 1.0f)
             {
                 image = "c";
             }
