@@ -93,22 +93,24 @@ namespace Chourbland
             }
         }
 
-        public Tuple<int, int> Move_agent()
+        public Tuple<int,int> Move_agent()
         {
-            foreach case in cases:
+            Tuple<int,int> next_pos_agent = new Tuple<int, int> (0,0);
+            foreach (Case box in beliefs)
             {
                 float safest = 1.0f;
-                if (Case.border == true)
+                if (box.Get_border() == true)
                 {
-                    if (Case.monster < safest)
+                    if (box.Get_Monster() < safest)
                     {
-                        safest = Case.monster;
-                        //next_pos_agent = pos_case;
-                        if (Case.cliff < safest)
-                        {
-                            safest = Case.cliff;
-                            //next_pos_agent = pos_case;
-                        }
+                        safest = box.Get_Monster();
+                        next_pos_agent = CoordinatesOf(beliefs, box);
+                        
+                    }
+                    else if (box.Get_Cliff() < safest)
+                    {
+                        safest = box.Get_Cliff();
+                        next_pos_agent = CoordinatesOf(beliefs, box);
                     }
                 } //else random between borders                
             }

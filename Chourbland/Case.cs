@@ -8,6 +8,8 @@ namespace Chourbland
 {
     public class Case
     {
+        private bool _agent = false;
+
         private float _monster = 0f;
         private bool _smell = false;
 
@@ -19,6 +21,8 @@ namespace Chourbland
 
         private bool _visited = false;
 
+        private bool _border = false;
+
         public string Image = " ";
 
         public Case()
@@ -26,6 +30,15 @@ namespace Chourbland
 
         }
 
+        public void Set_Agent(bool is_agent)
+        {
+            _agent = is_agent;
+            Update_Image();
+        }
+        public bool Get_Agent()
+        {
+            return _agent;
+        }
         public void Set_Monster(float a_monster) {
             _monster = a_monster;
             Update_Image();
@@ -85,10 +98,23 @@ namespace Chourbland
             return _visited;
         }
 
+        public void Set_border(bool is_border)
+        {
+            _border = is_border;
+        }
+        public bool Get_border()
+        {
+            return _border;
+        }
+
 
         private void Update_Image()
         {
-            if (_monster == 1.0f)
+            if (_agent == true)
+            {
+                Image = "A";
+            }
+            else if (_monster == 1.0f)
             {
                 Image = "m";
             }
@@ -112,6 +138,7 @@ namespace Chourbland
             {
                 Image = "l";
             }
+            
         }
 
     }
