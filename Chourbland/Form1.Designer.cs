@@ -50,6 +50,7 @@ namespace Chourbland
             this.grid.Name = "grid";
             this.grid.Size = new System.Drawing.Size(396, 283);
             this.grid.TabIndex = 1;
+            this.grid.Paint += new System.Windows.Forms.PaintEventHandler(this.grid_Paint);
             // 
             // button2
             // 
@@ -71,6 +72,7 @@ namespace Chourbland
             this.Controls.Add(this.button1);
             this.Name = "Form1";
             this.Text = "Form1";
+            this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
 
         }

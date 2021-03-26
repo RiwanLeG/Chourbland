@@ -88,7 +88,7 @@ namespace Chourbland
             {
                 for (int n = 0; n < cases.GetLength(1) - 1; n++)
                 {
-                    graphic.DrawString(cases[k, n].image.ToString(), font, Brushes.Black, k * size, n * size);
+                    graphic.DrawString(cases[k, n].Image.ToString(), font, Brushes.Black, k * size, n * size);
                 }
             }
 
@@ -113,7 +113,7 @@ namespace Chourbland
                 {
                     if((portal_position.Item1 != k) && (portal_position.Item2 != n)) {
                         Console.WriteLine("Un Monstre " + k + " " + n);
-                        Generate_Monster_Or_Cleaf(k,n);
+                        Generate_Monster_Or_Cliff(k,n);
                     }
                 }
             }
@@ -122,9 +122,8 @@ namespace Chourbland
         }
 
 
-
         // Génération d'éléments pour chacune des cases
-        private void Generate_Monster_Or_Cleaf(int new_x, int new_y)
+        private void Generate_Monster_Or_Cliff(int new_x, int new_y)
         {
 
             int index_random_object_type = random.Next(100);
@@ -136,7 +135,7 @@ namespace Chourbland
             // 20% de chance -> colline
             if (index_random_object_type <= 20)
             {
-                type_object = "cleaf";
+                type_object = "cliff";
                 cases[new_x, new_y].Set_Cliff(1.0f);
                 if (new_x > 0)
                     cases[new_x - 1, new_y].Set_Wind(true);
