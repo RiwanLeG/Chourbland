@@ -20,7 +20,7 @@ namespace Chourbland
         Case[,] cases = new Case[5, 5];
         // Nombre de ligne de la grille
         int line_number = 0;
-
+        
         // Elément de la grille
         List<Element> elements = new List<Element>();
 
@@ -244,8 +244,20 @@ namespace Chourbland
 
         private void button2_Click(object sender, EventArgs e)
         {
-            Agent agent = new Agent();
-            agent.Load_Json();
+            Tuple<int, int> initPos = new Tuple<int, int>(3, 2); 
+
+            //Console.WriteLine("cases " + cases[3,2].Image );
+            Agent personnage = new Agent(cases.GetLength(0), cases.GetLength(1), cases[initPos.Item1, initPos.Item2], initPos);
+            personnage.Forward_chaining();
+        }
+
+        private void grid_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
         }
     }
 }
