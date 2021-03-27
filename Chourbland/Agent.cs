@@ -142,7 +142,7 @@ namespace Chourbland
 
         // Fonction pour lire le JSON
 
-        public void Load_Json()
+        public JObject Load_Json()
         {
 
             string project_location = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
@@ -155,11 +155,12 @@ namespace Chourbland
             using (JsonTextReader reader = new JsonTextReader(file))
             {
                 JObject o2 = (JObject)JToken.ReadFrom(reader);
-                foreach (var element in o2)
+                return o2;
+/*                foreach (var element in o2)
                 {
                     Console.WriteLine("if : " + element.Key);
                     Console.WriteLine("else : " + element.Value["danger"].ToString());
-                }
+                }*/
             }
         }
     }
