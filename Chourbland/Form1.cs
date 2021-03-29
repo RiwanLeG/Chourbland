@@ -12,9 +12,10 @@ namespace Chourbland
 {
     public partial class Form1 : Form
     {
-        // Tableau de toutes les entrées
-        /*String[,] cases = new string[5, 5];*/
+        // Création de l'agent
+        Agent the_agent = new Agent();
 
+        // Taille du tableau
         int grid_size = 5;
 
         Case[,] cases = new Case[5, 5];
@@ -23,6 +24,9 @@ namespace Chourbland
         
         // Elément de la grille
         List<Element> elements = new List<Element>();
+
+        // Position actuelle de l'agent
+        Tuple<int, int> current_agent_position = Tuple.Create(0, 0);
 
         // Random
         Random random = new Random();
@@ -99,6 +103,7 @@ namespace Chourbland
 
         }
 
+        // Créer une nouvelle grille : agent en position initial (0,0)
         public void Create_Grid(int a_grid_size)
         {
             /*line_number = cases.GetLength(0);*/
@@ -107,14 +112,14 @@ namespace Chourbland
 
             cases = new Case[line_number, line_number];
             Initialize_Tab_Case();
-            // Génération aléatoirement du portail
-
-
 
             // Initialisation du tableau
-            Initialize_Tab_Case();
 
+            // Génération aléatoirement du portail
             Tuple<int,int> portal_position = Generate_Portal();
+
+            // Positionnement de l'agent sur la grille
+            Agent_position_on_the_grid();
 
             /*Console.WriteLine("portal_position : " + portal_position);*/
 
@@ -123,13 +128,14 @@ namespace Chourbland
             {
                 for (int n = 0; n < cases.GetLength(1); n++)
                 {
-                    if((portal_position.Item1 != k) && (portal_position.Item2 != n)) {
+                    // pas de génération de monstre sur la position du portail et de l'agent
+                    if (((portal_position.Item1 != k) && (portal_position.Item2 != n)) && ((current_agent_position.Item1 != k) && (current_agent_position.Item2 != n))) {
                         /*Console.WriteLine("Un Monstre " + k + " " + n);*/
                         Generate_Monster_Or_Cliff(k,n);
                     }
                 }
             }
-            Draw_Grid();
+            /*Draw_Grid();*/
         }
 
 
@@ -191,6 +197,17 @@ namespace Chourbland
             return Tuple.Create(portal_x,portal_y);
         }
 
+        // Restart la position de l'agent
+        public void Agent_position_on_the_grid()
+        {
+            // Initialisation de l'agent à la case (0,0)
+            the_agent = new Agent(cases.GetLength(0), cases.GetLength(1), cases[current_agent_position.Item1, current_agent_position.Item2], current_agent_position);
+
+            current_agent_position = Tuple.Create(0, 0);
+            cases[current_agent_position.Item1, current_agent_position.Item2].Set_Agent(true);
+        }
+
+        // Fonction de débugage
         private void Display_Grid(Case[,] a_cases)
         {
 
@@ -205,59 +222,124 @@ namespace Chourbland
             }
         }
 
-        private void Update_Agent_position(Tuple<int, int> old_agent_position, Tuple<int,int> new_agent_position)
+        private void Update_Agent_position(Tuple<int,int> new_agent_position)
         {
+            // Test de victoire ou de défaite de l'agent
+            bool restard_grid = Victory_And_Defeat_Test(new_agent_position);
+
             // Suppression de l'ancienne position de l'agent
-            cases[old_agent_position.Item1, old_agent_position.Item2].Set_Agent(false);
+            cases[current_agent_position.Item1, current_agent_position.Item2].Set_Agent(false);
+            if (restard_grid)
+            {
+                current_agent_position = Tuple.Create(0, 0);
+                Create_Grid(grid_size);
+            }
+            else
+            {
+                current_agent_position = new_agent_position;
+                // Mis à jour de l'ancienne position qui devient la position actuelle
+                cases[new_agent_position.Item1, new_agent_position.Item2].Set_Agent(true);
+            }
 
-            // Mis à jour du déplacement de l'agent
-            cases[new_agent_position.Item1, new_agent_position.Item2].Set_Agent(true);
+            // On translets à l'agent la case sur laquelle il se trouve ainsi que sa nouvelle position
+            the_agent.Set_agent_position(cases[current_agent_position.Item1, current_agent_position.Item2], current_agent_position);
 
+            Draw_Grid();
+        }
+
+        // Test de victoire et de défaite en fonction de la position passsée en paramètre
+        private bool Victory_And_Defeat_Test(Tuple<int,int> agent_position)
+        {
+            bool restart_the_grid = false;
             // Test si agent encore en vie
-            if((cases[new_agent_position.Item1, new_agent_position.Item2].Get_Cliff() == 1.0f) || (cases[new_agent_position.Item1, new_agent_position.Item2].Get_Monster() == 1.0f))
+            if ((cases[agent_position.Item1, agent_position.Item2].Get_Cliff() == 1.0f) || (cases[agent_position.Item1, agent_position.Item2].Get_Monster() == 1.0f))
             {
                 // Fonction supprimer l'agent + regénération de la grille
                 Console.WriteLine("DEFEAT !");
-                Create_Grid(grid_size);
+                restart_the_grid = true;
             }
-            if ((cases[new_agent_position.Item1, new_agent_position.Item2]).Get_Portal() == 1.0f)
+            if ((cases[agent_position.Item1, agent_position.Item2]).Get_Portal() == 1.0f)
             {
                 // Pop up victoire + regénération de la grile
                 Console.WriteLine("VICTORY !");
-                Create_Grid(grid_size);
+
+                // On augmente la taille de la grille
+                grid_size++;
+                restart_the_grid = true;
             }
+            return restart_the_grid;
         }
 
 
         private void button1_Click(object sender, EventArgs e)
         {
-            // On passe en paramètre le tableau et on le dessine
-            /*Console.WriteLine("before");
-            Display_Grid(cases);*/
-
+            // Création de la 1ère grille
             Create_Grid(grid_size);
-            grid_size++;
-            Console.WriteLine("GridSize : " + grid_size);
-            Console.WriteLine("after");
-            Display_Grid(cases);
+            
+            // On dessine la grille
+            Draw_Grid();
         }
+
 
         private void button2_Click(object sender, EventArgs e)
         {
-            Tuple<int, int> initPos = new Tuple<int, int>(3, 2); 
 
-            //Console.WriteLine("cases " + cases[3,2].Image );
-            Agent personnage = new Agent(cases.GetLength(0), cases.GetLength(1), cases[initPos.Item1, initPos.Item2], initPos);
-            personnage.Forward_chaining();
+            /*Agent the_agent = new Agent(cases.GetLength(0), cases.GetLength(1), cases[current_agent_position.Item1, current_agent_position.Item2], current_agent_position);*/
+
+            // On applique le chainage avant
+            the_agent.Forward_chaining();
+
+            // Nouvelle position de l'agent
+            Tuple<int, int> new_agent_position = the_agent.Move_agent();
+
+            // Mise à jour graphique et dans le tableau cases de la position de l'agent
+            Update_Agent_position(new_agent_position);
         }
 
-        private void grid_Paint(object sender, PaintEventArgs e)
+        private void button6_Click(object sender, EventArgs e)
         {
-
+            Tuple<int, int> new_agent_position;
+            if (current_agent_position.Item2 > 0)
+            {
+                new_agent_position = Tuple.Create(current_agent_position.Item1, current_agent_position.Item2 - 1);
+                Update_Agent_position(new_agent_position);
+            }
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private void button3_Click(object sender, EventArgs e)
         {
+            Tuple<int, int> new_agent_position;
+            if (current_agent_position.Item1 > 0)
+            {
+                new_agent_position = Tuple.Create(current_agent_position.Item1 - 1, current_agent_position.Item2);
+                Update_Agent_position(new_agent_position);
+            }
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            Tuple<int, int> new_agent_position;
+            if (current_agent_position.Item1 < cases.GetLength(0) - 1) { 
+                new_agent_position = Tuple.Create(current_agent_position.Item1 + 1, current_agent_position.Item2);
+                Update_Agent_position(new_agent_position);
+            }
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            Tuple<int, int> new_agent_position;
+            if (current_agent_position.Item2 < cases.GetLength(1) - 1)
+            {
+                new_agent_position = Tuple.Create(current_agent_position.Item1, current_agent_position.Item2 + 1);
+                Update_Agent_position(new_agent_position);
+            }
+        }
+
+        // Test de la fonction de récupération du fichier Json
+        private void button7_Click(object sender, EventArgs e)
+        {
+            Agent the_agent = new Agent(cases.GetLength(0), cases.GetLength(1), cases[current_agent_position.Item1, current_agent_position.Item2], current_agent_position);
+            the_agent.Load_Json();
         }
     }
 }
