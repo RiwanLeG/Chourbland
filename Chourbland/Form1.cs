@@ -15,7 +15,7 @@ namespace Chourbland
         // Tableau de toutes les entrées
         /*String[,] cases = new string[5, 5];*/
 
-        Case[,] cases = new Case[5, 5];
+        Case[,] cases = new Case[4, 4];
         // Nombre de ligne de la grille
         int line_number = 0;
         
@@ -33,9 +33,9 @@ namespace Chourbland
         public void Initialize_Tab_Case()
         {
             // Initialisation des cellules du tableau
-            for (int column = 0; column < 5; column++)
+            for (int column = 0; column < cases.GetLength(0); column++)
             {
-                for (int row = 0; row < 5; row++)
+                for (int row = 0; row < cases.GetLength(0); row++)
                 {
                     Case new_case = new Case();
                     cases[column, row] = new_case;
@@ -68,25 +68,25 @@ namespace Chourbland
 
             // lignes verticales
             /*for (int i = 0; i < line_number; i++)*/
-            for (int i = 0; i < line_number; i++)
+            for (int i = 0; i <= line_number; i++)
             {
-                graphic.DrawLine(pen, x, 0, x, line_number * size - size);
+                graphic.DrawLine(pen, x, 0, x, line_number * size);
                 x += size;
             }
 
             // lignes horizontales
-            for (int i = 0; i < line_number; i++)
+            for (int i = 0; i <= line_number; i++)
             {
-                graphic.DrawLine(pen, 0, y, line_number * size - size, y);
+                graphic.DrawLine(pen, 0, y, line_number * size, y);
                 y += size;
             }
 
 
 
             // Pour chaque case : on génère ou non un élément
-            for (int k = 0; k < cases.GetLength(0)-1; k++)
+            for (int k = 0; k < cases.GetLength(0); k++)
             {
-                for (int n = 0; n < cases.GetLength(1) - 1; n++)
+                for (int n = 0; n < cases.GetLength(1) ; n++)
                 {
                     graphic.DrawString(cases[k, n].Image.ToString(), font, Brushes.Black, k * size, n * size);
                 }
@@ -107,12 +107,12 @@ namespace Chourbland
             Console.WriteLine("portal_position : " + portal_position);
 
             // Pour chaque case : on génère ou non un élément
-            for (int k = 0; k < line_number - 1; k++)
+            for (int k = 0; k < line_number -1 ; k++)
             {
                 for (int n = 0; n < line_number - 1; n++)
                 {
                     if((portal_position.Item1 != k) && (portal_position.Item2 != n)) {
-                        Console.WriteLine("Un Monstre " + k + " " + n);
+                        //Console.WriteLine("Un Monstre " + k + " " + n);
                         Generate_Monster_Or_Cliff(k,n);
                     }
                 }
@@ -188,9 +188,9 @@ namespace Chourbland
             {
                 for (int n = 0; n < a_cases.GetLength(1); n++)
                 {
-                    Console.Write(a_cases[k, n] + " ");
+                    //Console.Write(a_cases[k, n].Get_Light() + " ");
                 }
-                Console.WriteLine("");
+                //Console.WriteLine("");
             }
 
         }
@@ -199,8 +199,8 @@ namespace Chourbland
         private void button1_Click(object sender, EventArgs e)
         {
             // On passe en paramètre le tableau et on le dessine
-            Console.WriteLine("before");
-            Display_Grid(cases);
+            //Console.WriteLine("before");
+            //Display_Grid(cases);
 
             Create_Grid();
 
@@ -210,10 +210,11 @@ namespace Chourbland
 
         private void button2_Click(object sender, EventArgs e)
         {
-            Tuple<int, int> initPos = new Tuple<int, int>(3, 2); 
+            Tuple<int, int> initPos = new Tuple<int, int>(0,0); 
 
             //Console.WriteLine("cases " + cases[3,2].Image );
             Agent personnage = new Agent(cases.GetLength(0), cases.GetLength(1), cases[initPos.Item1, initPos.Item2], initPos);
+            Console.WriteLine("button2_Click: Case(" + initPos.Item1 + "," + initPos.Item2 + "): smell:" + cases[initPos.Item1, initPos.Item2].Get_Smell() + "; wind:" + cases[initPos.Item1, initPos.Item2].Get_Wind() + "; light:" + cases[initPos.Item1, initPos.Item2].Get_Light());
             personnage.Forward_chaining();
         }
 

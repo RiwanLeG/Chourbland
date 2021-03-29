@@ -45,6 +45,13 @@ namespace Chourbland
             }
 
             beliefs[this.pos_agent.Item1, this.pos_agent.Item1] = initialposition;
+
+            Console.WriteLine("initiale Case(" + initialPos.Item1 + "," + initialPos.Item2 + "): smell:" + initialposition.Get_Smell()
+                              + "; wind:" + initialposition.Get_Wind()
+                              + "; light:" + initialposition.Get_Light());
+            Console.WriteLine("belief Case(" + this.pos_agent.Item1 + "," + this.pos_agent.Item2 + "): smell:" + beliefs[this.pos_agent.Item1, this.pos_agent.Item1].Get_Smell()
+                              + "; wind:" + beliefs[this.pos_agent.Item1, this.pos_agent.Item1].Get_Wind()
+                              + "; light:" + beliefs[this.pos_agent.Item1, this.pos_agent.Item1].Get_Light());
             Console.WriteLine("I'm aliiiiiive");
         }
 
@@ -66,11 +73,12 @@ namespace Chourbland
                     int xdx = x + dx;
                     int ydy = y + dy;
                     //On vérifie bien qu'on ne sort pas de la grille
-                    if ((xdx < 0) || (xdx > currentGrid.GetLength(0)) || (ydy < 0) ||
-                        (ydy > currentGrid.GetLength(1)))
+                    if ((xdx < 0) || (xdx >= currentGrid.GetLength(0)) || (ydy < 0) ||
+                        (ydy >= currentGrid.GetLength(1)))
                     {
                         continue;
                     }
+                    Console.WriteLine("just after continue");
                     Case candidate = currentGrid[xdx,ydy];
                     if ((dx != 0 && dy == 0) || (dx == 0 && dy != 0) && !candidate.Get_Visited())
                     {
@@ -113,19 +121,21 @@ namespace Chourbland
             Console.WriteLine("Forward chaining");
             var x = this.pos_agent.Item1;
             var y = this.pos_agent.Item2;
-            var currentCase = this.beliefs[x, y];
+            //Case currentCase = this.beliefs[x, y];
             Console.WriteLine("Case actuelle : "+x+" "+y);
-            if (currentCase.Get_Smell())
+            Console.WriteLine("Case actuelle : " + beliefs[x,y].GetType());
+            Console.WriteLine("Case actuelle : smell: " + beliefs[pos_agent.Item1, pos_agent.Item2].Get_Smell()+"; wind:"+ beliefs[pos_agent.Item1, pos_agent.Item2].Get_Wind() + "; light:" + beliefs[x, y].Get_Light());
+            if (beliefs[x, y].Get_Smell())
             {
                 Console.WriteLine("There is a monster nearby");
                 Update_all_unknown_adjacent_cases(this.pos_agent, this.beliefs, "monster", 1f);
             }
-            if (currentCase.Get_Wind())
+            if (beliefs[x, y].Get_Wind())
             {
                 Console.WriteLine("There is a cliff nearby");
                 Update_all_unknown_adjacent_cases(this.pos_agent, this.beliefs, "cliff", 1f);
             }
-            if (currentCase.Get_Light())
+            if (beliefs[x, y].Get_Light())
             {
                 Console.WriteLine("There is a portal nearby");
                 Update_all_unknown_adjacent_cases(this.pos_agent, this.beliefs, "portal", 1f);
