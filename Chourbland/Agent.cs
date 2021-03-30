@@ -164,12 +164,12 @@ namespace Chourbland
                 Console.WriteLine("There is a monster nearby");
                 Update_all_unknown_adjacent_cases(pos_agent, "monster", 1f);
             }
-            if (currentCase.Get_Wind())
+            if (beliefs[x, y].Get_Wind())
             {
                 Console.WriteLine("There is a cliff nearby");
                 Update_all_unknown_adjacent_cases(pos_agent, "cliff", 1f);
             }
-            if (currentCase.Get_Light())
+            if (beliefs[x, y].Get_Light())
             {
                 Console.WriteLine("There is a portal nearby");
                 Update_all_unknown_adjacent_cases(pos_agent, "portal", 1f);

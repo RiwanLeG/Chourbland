@@ -215,9 +215,9 @@ namespace Chourbland
             {
                 for (int n = 0; n < a_cases.GetLength(1); n++)
                 {
-                    Console.Write(a_cases[n, k].Get_Light() + " ");
+                    //Console.Write(a_cases[k, n].Get_Light() + " ");
                 }
-                Console.WriteLine("");
+                //Console.WriteLine("");
             }
         }
 
