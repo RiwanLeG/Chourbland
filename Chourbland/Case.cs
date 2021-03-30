@@ -62,8 +62,17 @@ namespace Chourbland
         public void Add_Cliff(float a_cliff)
         {
             _cliff = a_cliff + 0.25f ;
-            Update_Image();
+            /*Update_Image();*/
         }
+
+
+        public void Substract_cliff(float value)
+        {
+            _cliff += value;
+            /*Update_Image();*/
+        }
+
+
         public float Get_Cliff()
         {
             return _cliff;

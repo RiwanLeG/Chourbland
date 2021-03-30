@@ -141,7 +141,8 @@ namespace Chourbland
                         if(goal == "portal")
                         {
                             Console.WriteLine("Portail en vu !");
-                            candidate.Set_Portal(0f);
+                            /*candidate.Set_Portal(0f);*/
+                            candidate.Substract_cliff(-0.25f);
                         }
                     }
                 }
@@ -325,7 +326,7 @@ namespace Chourbland
                 }
 
                 // On applique la règle choisie
-                Update_all_unknown_adjacent_cases(pos_agent, a_rule.Value["danger"].ToString(), 0.25f);
+                Update_all_unknown_adjacent_cases(pos_agent, a_rule, 0.25f);
 
             }
         }
