@@ -45,6 +45,7 @@ namespace Chourbland
             }
 
             beliefs[initialPos.Item1, initialPos.Item2] = initialposition_case;
+            beliefs[initialPos.Item1, initialPos.Item2].Set_visited(true);
         }
 
         public Agent() { }
