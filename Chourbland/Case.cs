@@ -43,6 +43,12 @@ namespace Chourbland
             _monster = a_monster;
             Update_Image();
         }
+
+        public void Add_Monster(float a_monster)
+        {
+            _monster = a_monster + 0.25f;
+            Update_Image();
+        }
         public float Get_Monster()
         {
             return _monster;
@@ -52,6 +58,21 @@ namespace Chourbland
             _cliff = a_cliff;
             Update_Image();
         }
+
+        public void Add_Cliff(float a_cliff)
+        {
+            _cliff = a_cliff + 0.25f ;
+            /*Update_Image();*/
+        }
+
+
+        public void Substract_cliff(float value)
+        {
+            _cliff += value;
+            /*Update_Image();*/
+        }
+
+
         public float Get_Cliff()
         {
             return _cliff;

@@ -282,7 +282,10 @@ namespace Chourbland
         {
             // Création de la 1ère grille
             Create_Grid(grid_size);
-            
+
+            // Test si l'agent spawn sur le portail
+            Update_Agent_position(current_agent_position);
+
             // On dessine la grille
             Draw_Grid();
         }
