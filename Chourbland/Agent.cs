@@ -24,14 +24,14 @@ namespace Chourbland
         public Object portal_searched = new Object();
 
         //Beliefs
-        public Case[,] beliefs = new Case[,]{};
+        public Case[,] beliefs = new Case[,] { };
 
-        // Podition de l'agent
+        // Position de l'agent
         public Tuple<int, int> pos_agent = new Tuple<int, int>(0, 0);
 
-        public int performance_indicator = 0;
+        private int performance_indicator = 0;
 
-        public Agent(int length, int width, Case initialposition_case,Tuple<int, int> initialPos)
+        public Agent(int length, int width, Case initialposition_case, Tuple<int, int> initialPos)
         {
             pos_agent = initialPos;
             beliefs = new Case[length, width];
@@ -45,23 +45,28 @@ namespace Chourbland
             }
 
             beliefs[initialPos.Item1, initialPos.Item2] = initialposition_case;
-
-            /*Console.WriteLine("Après affectation : ");
-            beliefs[initialPos.Item1, initialPos.Item2].Display_case();*/
-            /*beliefs[this.pos_agent.Item1, this.pos_agent.Item1]*/
-            Console.WriteLine("I'm aliiiiiive");
         }
+
         public Agent() { }
+
+        public void Set_performance_indicator(int value)
+        {
+            performance_indicator += value;
+            Console.WriteLine("performance_indicator : " + performance_indicator);
+        }
 
         public void Shoot_rock(Tuple<int, int> target_pos)
         {
+            // Récompense négative
+            Set_performance_indicator(-1);
+
             /*            if element on the cell == "monster"
                             kill_monster(target_pos);
             */
         }
 
         // On position l'agent
-        public void Set_agent_position(Case a_case, Tuple<int,int> agent_position)
+        public void Set_agent_position(Case a_case, Tuple<int, int> agent_position)
         {
             // On lui transmets les informations de la case surlaquelle il se trouve
             beliefs[agent_position.Item1, agent_position.Item2] = a_case;
@@ -71,14 +76,14 @@ namespace Chourbland
 
             // La case a été visitée
             beliefs[agent_position.Item1, agent_position.Item2].Set_visited(true);
-
-            Console.WriteLine("Set the agent position : " + pos_agent);
         }
 
         // Met à jour toutes les cases à côté de l'agent en fonction de sa case
         /*public void Update_all_unknown_adjacent_cases(Tuple<int, int> currentCasePos, Case[,] currentGrid, string field, float value)*/
-        public void Update_all_unknown_adjacent_cases(Tuple<int, int> currentCasePos,  string field, float value)
+        public void Update_all_unknown_adjacent_cases(Tuple<int, int> currentCasePos, string field, float value)
         {
+
+            Console.WriteLine("field : " + field);
             int x = currentCasePos.Item1;
             int y = currentCasePos.Item2;
 
@@ -91,37 +96,45 @@ namespace Chourbland
                     int xdx = x + dx;
                     int ydy = y + dy;
                     //On vérifie bien qu'on ne sort pas de la grille
-                    if ((xdx < 0) || (xdx > beliefs.GetLength(0)-1) || (ydy < 0) ||
-                        (ydy > beliefs.GetLength(1)-1))
+                    if ((xdx < 0) || (xdx > beliefs.GetLength(0) - 1) || (ydy < 0) ||
+                        (ydy > beliefs.GetLength(1) - 1))
                     {
                         continue;
                     }
-                    Case candidate = beliefs[xdx,ydy];
+                    Case candidate = beliefs[xdx, ydy];
                     if (((dx != 0 && dy == 0) || (dx == 0 && dy != 0)) && !candidate.Get_Visited())
                     {
                         candidate.Set_border(true);
-                        /*candidate.Display_case();*/
+                        number_candidate++;
                         //Console.WriteLine("Case(" + xdx + "," + ydy + "): monster:" + candidate.Get_Monster() + "; cliff:" + candidate.Get_Cliff() + "; portal:" + candidate.Get_Portal());
                         if (field == "monster")
                         {
+                            Console.WriteLine("Attention monstre !");
                             candidate.Set_Monster(value);
                         }
                         if (field == "cliff")
                         {
+                            Console.WriteLine("Attention cliff !");
                             candidate.Set_Cliff(value);
                         }
                         if (field == "portal")
                         {
+                            Console.WriteLine("Attention portal !");
                             candidate.Set_Portal(value);
                         }
-                        /*candidate.Display_case();*/
-                        //Console.WriteLine("then Case("+xdx+","+ydy+"): monster:"+candidate.Get_Monster()+"; cliff:"+candidate.Get_Cliff()+"; portal:"+candidate.Get_Portal());
+                        if (field == "none")
+                        {
+                            Console.WriteLine("Il n'y a rien en vue !");
+                            candidate.Set_Portal(0f);
+                            candidate.Set_Cliff(0f);
+                            candidate.Set_Monster(0f);
+                        }
                     }
                 }
             }
-            /*Console.WriteLine("number_candidate : " + number_candidate);*/
+            Console.WriteLine("number_candidate : " + number_candidate);
         }
-        public static Tuple<int, int> CoordinatesOf( Case[,] grid, Case box)
+        public static Tuple<int, int> CoordinatesOf(Case[,] grid, Case box)
         {
             int w = grid.GetLength(0); // width
             int h = grid.GetLength(1); // height
@@ -145,7 +158,7 @@ namespace Chourbland
             var y = pos_agent.Item2;
             var currentCase = beliefs[x, y];
 
-            Console.WriteLine("Case actuelle : "+x+" "+y);
+            Console.WriteLine("Case actuelle : " + x + " " + y);
             if (currentCase.Get_Smell())
             {
                 Console.WriteLine("There is a monster nearby");
@@ -165,7 +178,7 @@ namespace Chourbland
             }
 
             // Si il n'y a rien
-            if((!currentCase.Get_Wind()) && (!currentCase.Get_Light()) && (!currentCase.Get_Smell()))
+            if ((!currentCase.Get_Wind()) && (!currentCase.Get_Light()) && (!currentCase.Get_Smell()))
             {
                 Update_all_unknown_adjacent_cases(pos_agent, "portal", 0f);
                 Update_all_unknown_adjacent_cases(pos_agent, "monster", 0f);
@@ -173,10 +186,13 @@ namespace Chourbland
             }
         }
 
-        public Tuple<int,int> Move_agent()
+        public Tuple<int, int> Move_agent()
         {
             Console.WriteLine("Move");
-            Tuple<int,int> next_pos_agent = new Tuple<int, int> (0,0);
+            // Récompense négative
+            Set_performance_indicator(-10);
+
+            Tuple<int, int> next_pos_agent = new Tuple<int, int>(0, 0);
             float safest = 1.0f;
             int number_iteration = 0;
             foreach (Case box in beliefs)
@@ -221,14 +237,14 @@ namespace Chourbland
                         continue;
                     }
                     Case candidate = beliefs[xdx, ydy];
-                    if ((dx != 0 && dy == 0) || (dx == 0 && dy != 0) && !candidate.Get_Visited())
+/*                    if ((dx != 0 && dy == 0) || (dx == 0 && dy != 0) && !candidate.Get_Visited())
                     {
                         candidate.Set_border(true);
-                    }
+                    }*/
                 }
             }
-/*            Console.WriteLine("next_pos_agent : " + next_pos_agent);
-            Console.WriteLine("number_iteration : " + number_iteration);*/
+            /*            Console.WriteLine("next_pos_agent : " + next_pos_agent);
+                        Console.WriteLine("number_iteration : " + number_iteration);*/
             return next_pos_agent;
         }
 
@@ -242,20 +258,93 @@ namespace Chourbland
 
             string path = project_location + @"\..\..\Rules.json";
 
-            Console.WriteLine("path : " + path);
             // read JSON directly from a file
             using (StreamReader file = File.OpenText(path))
             using (JsonTextReader reader = new JsonTextReader(file))
             {
-                JObject o2 = (JObject)JToken.ReadFrom(reader);
-                foreach (var element in o2)
-                {
-                    Console.WriteLine("if : " + element.Key);
-                    Console.WriteLine("else : " + element.Value["danger"].ToString());
-                }
-                Console.WriteLine("Number of element in the JObject : " + o2.Count);
-                return o2;
+                JObject rules = (JObject)JToken.ReadFrom(reader);
+
+                return rules;
             }
         }
+
+        private bool Is_the_rule_applicable(KeyValuePair<string,JToken> a_rule, Case a_case)
+        {
+            bool is_rule_applicable = false;
+            if ((a_rule.Key == "smell") && (a_case.Get_Smell() == true))
+            {
+                is_rule_applicable = true;
+            }
+            if ((a_rule.Key == "wind") && (a_case.Get_Wind() == true))
+            {
+                is_rule_applicable = true;
+            }
+            if ((a_rule.Key == "shine") && (a_case.Get_Light() == true))
+            {
+                is_rule_applicable = true;
+            }
+            if ((a_rule.Key == "nothing") && (!a_case.Get_Smell() && !a_case.Get_Wind() && !a_case.Get_Light()))
+            {
+                is_rule_applicable = true;
+            }
+            Console.WriteLine("La règle est applicable : " + is_rule_applicable);
+            return is_rule_applicable;
+        }
+
+        // Choisi la première règle applicable du dictionnaire
+        public KeyValuePair<string, JToken> Get_a_chosen_rule(Dictionary<KeyValuePair<string, JToken>, bool> rules)
+        {
+            KeyValuePair<string, JToken> rule_chosen = new KeyValuePair<string, JToken>();
+            foreach (var rule in rules)
+            {
+                if (rule.Value == true)
+                {
+                    rule_chosen = rule.Key;
+                    break;
+                }
+            }
+            return rule_chosen;
+        }
+
+
+        // Chainage avant
+        public void Forward_chaining_new_version()
+        {
+            // Récupération de la position actuelle de l'agent ainsi que de sa case
+            var x = pos_agent.Item1;
+            var y = pos_agent.Item2;
+            var currentCase = beliefs[x, y];
+
+            // Récupération des règles du fichier Json
+            JObject rules = Load_Json();
+
+
+            // Création d'une queue à laquelle nous allons ajouter toutes les règles du Json
+            Queue<KeyValuePair<string, JToken>> queue_rules = new Queue<KeyValuePair<string, JToken>>();
+            foreach (var rule in rules)
+            {
+                queue_rules.Enqueue(rule);
+            }
+
+            // On parcourt toutes les règles de la queue et on supprime celle marquée
+            while (queue_rules.Count != 0)
+            {
+                Console.WriteLine("Nombre de règle : " + queue_rules.Count());
+
+                // On Choisit une règle
+                KeyValuePair<string, JToken> a_rule = queue_rules.Dequeue();
+
+                // Si la règle n'est pas appliccable on passe à l'itération suivante
+                if(!Is_the_rule_applicable(a_rule, currentCase))
+                {
+                    continue;
+                }
+
+                // On applique la règle choisie
+                Update_all_unknown_adjacent_cases(pos_agent, a_rule.Value["danger"].ToString(), 1f);
+
+            }
+        }
+
     }
 }

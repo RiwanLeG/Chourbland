@@ -100,7 +100,6 @@ namespace Chourbland
                     graphic.DrawString(cases[k, n].Image.ToString(), font, Brushes.Black, k * size, n * size);
                 }
             }
-
         }
 
         // Créer une nouvelle grille : agent en position initial (0,0)
@@ -257,11 +256,19 @@ namespace Chourbland
                 // Fonction supprimer l'agent + regénération de la grille
                 Console.WriteLine("DEFEAT !");
                 restart_the_grid = true;
+
+                // Récompense négative
+                the_agent.Set_performance_indicator(-10 * grid_size * grid_size);
+
             }
             if ((cases[agent_position.Item1, agent_position.Item2]).Get_Portal() == 1.0f)
             {
                 // Pop up victoire + regénération de la grile
                 Console.WriteLine("VICTORY !");
+
+                // Récompense positive
+                the_agent.Set_performance_indicator(10* grid_size* grid_size);
+
 
                 // On augmente la taille de la grille
                 grid_size++;
@@ -287,7 +294,11 @@ namespace Chourbland
             /*Agent the_agent = new Agent(cases.GetLength(0), cases.GetLength(1), cases[current_agent_position.Item1, current_agent_position.Item2], current_agent_position);*/
 
             // On applique le chainage avant
-            the_agent.Forward_chaining();
+            /*the_agent.Forward_chaining();*/
+
+            Console.WriteLine("");
+
+            the_agent.Forward_chaining_new_version();
 
             // Nouvelle position de l'agent
             Tuple<int, int> new_agent_position = the_agent.Move_agent();
@@ -296,6 +307,10 @@ namespace Chourbland
             Update_Agent_position(new_agent_position);
         }
 
+
+
+
+        // Bouton de déplacement pour test -----------------------------------
         private void button6_Click(object sender, EventArgs e)
         {
             Tuple<int, int> new_agent_position;
