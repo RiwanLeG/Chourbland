@@ -1,19 +1,16 @@
 {
     "smell": {
-        "danger": "monster",
-        "goal": "none"
+        "danger": "monster"
     },
     "wind": {
-        "danger": "cliff",
-        "goal": "none"
+        "danger": "cliff"
     },
     "shine": {
         "danger": "none",
         "goal": "portal"
     },
     "nothing": {
-        "danger": "none",
-        "goal": "none"
+        "danger": "none"
     }
 }
 

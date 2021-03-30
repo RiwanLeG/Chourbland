@@ -115,12 +115,12 @@ namespace Chourbland
                         if (danger == "monster")
                         {
                             Console.WriteLine("Attention monstre !");
-                            candidate.Set_Monster(value);
+                            candidate.Add_Monster(value);
                         }
                         if (danger == "cliff")
                         {
                             Console.WriteLine("Attention cliff !");
-                            candidate.Set_Cliff(value);
+                            candidate.Add_Cliff(value);
                         }
                         if (danger == "portal")
                         {
@@ -176,29 +176,32 @@ namespace Chourbland
             int number_iteration = 0;
             foreach (Case box in beliefs)
             {
-
+                
+                if (box.Get_border()/* || box.Get_Visited()*/)
+                {
+                    Console.WriteLine("POS" + CoordinatesOf(beliefs, box) + " danger="+ (box.Get_Monster() + box.Get_Cliff()) + "\nMonster ?:" + box.Get_Smell() + box.Get_Monster() + "Cliff ?:" + box.Get_Wind() + box.Get_Cliff());
+                }
                 //if ((box.Get_border() == true)&&(box.Get_Visited() == false))
                 /*Console.WriteLine("box.Get_border() : " + box.Get_border());*/
                 /*Console.WriteLine("box.Get_Visited() : " + box.Get_Visited());*/
                 if (box.Get_border())
                 {
                     number_iteration++;
-                    next_pos_agent = CoordinatesOf(beliefs, box);
+                    //next_pos_agent = CoordinatesOf(beliefs, box);
                     Console.WriteLine("box.Get_Visited() : " + next_pos_agent);
-                    if (box.Get_Monster() < safest)
+                    if ((box.Get_Monster() + box.Get_Cliff()) < safest)
                     {
-                        safest = box.Get_Monster();
+                        safest = (box.Get_Monster() + box.Get_Cliff());
                         next_pos_agent = CoordinatesOf(beliefs, box);
-                        Console.WriteLine("Position monstre ! ");
+                        Console.WriteLine("Position monstre ! " + safest);
 
                     }
-                    else if (box.Get_Cliff() < safest)
+                    /*if (box.Get_Cliff() < safest)
                     {
                         safest = box.Get_Cliff();
                         next_pos_agent = CoordinatesOf(beliefs, box);
                         Console.WriteLine("Position falaise ! ");
-                    }
-
+                    }*/
                 } //else random between borders                
             }
 
@@ -293,6 +296,8 @@ namespace Chourbland
             var x = pos_agent.Item1;
             var y = pos_agent.Item2;
             var currentCase = beliefs[x, y];
+            Console.WriteLine("Case actuelle : " + x + " " + y);
+
 
             // Récupération des règles du fichier Json
             JObject rules = Load_Json();
@@ -320,7 +325,7 @@ namespace Chourbland
                 }
 
                 // On applique la règle choisie
-                Update_all_unknown_adjacent_cases(pos_agent, a_rule, 1f);
+                Update_all_unknown_adjacent_cases(pos_agent, a_rule.Value["danger"].ToString(), 0.25f);
 
             }
         }
