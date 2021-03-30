@@ -58,11 +58,45 @@ namespace Chourbland
         public void Shoot_rock(Tuple<int, int> target_pos)
         {
             // Récompense négative
-            Set_performance_indicator(-1);
+            Set_performance_indicator(-10);
 
             /*            if element on the cell == "monster"
                             kill_monster(target_pos);
             */
+        }
+
+        public void Consider_shooting_rock()
+        {
+            float monsterProb = 0f;
+            Tuple<int, int> target_pos = new Tuple<int, int>(-1,-1);
+            foreach (var box in beliefs)
+            {
+                if (box.Get_border())
+                {
+                    //si il existe une case frontière sans niveau de danger, on peut déjà quitter cette fonction
+                    if (box.Get_Monster() == 0f)
+                    {
+                        return;
+                    }
+                    else
+                    {
+                        //On choisit la case avec la plus haute probabilité d'avoir un monstre
+                        if (box.Get_Monster() > monsterProb)
+                        {
+                            monsterProb = box.Get_Monster();
+                            target_pos = CoordinatesOf(beliefs, box);
+                        }
+                    }
+                }
+                //Les cases non-comprises dans la frontière ne nous intéressent pas
+                else
+                {
+                    continue;
+                }
+            }
+            Console.WriteLine("L'agent va tirer en :("+target_pos.Item1+","+target_pos.Item2+")");
+            Shoot_rock(target_pos);
+            return;
         }
 
         // On position l'agent
@@ -192,7 +226,7 @@ namespace Chourbland
         {
             Console.WriteLine("Move");
             // Récompense négative
-            Set_performance_indicator(-10);
+            Set_performance_indicator(-1);
 
             Tuple<int, int> next_pos_agent = new Tuple<int, int>(0, 0);
             float safest = 1.0f;
