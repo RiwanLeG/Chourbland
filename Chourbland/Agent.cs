@@ -74,8 +74,10 @@ namespace Chourbland
             // Mis à jour de la position de l'agent
             pos_agent = agent_position;
 
-            // La case a été visitée
+            // La case a été visitée et ne fait plus parti de la frontière
             beliefs[agent_position.Item1, agent_position.Item2].Set_visited(true);
+            beliefs[agent_position.Item1, agent_position.Item2].Set_border(false);
+
         }
 
         // Met à jour toutes les cases à côté de l'agent en fonction de sa case
@@ -201,7 +203,7 @@ namespace Chourbland
                 //if ((box.Get_border() == true)&&(box.Get_Visited() == false))
                 /*Console.WriteLine("box.Get_border() : " + box.Get_border());*/
                 /*Console.WriteLine("box.Get_Visited() : " + box.Get_Visited());*/
-                if ((box.Get_border() == true) && (box.Get_Visited() == false))
+                if (box.Get_border())
                 {
                     number_iteration++;
                     next_pos_agent = CoordinatesOf(beliefs, box);
