@@ -81,11 +81,13 @@ namespace Chourbland
         }
 
         // Met à jour toutes les cases à côté de l'agent en fonction de sa case
-        /*public void Update_all_unknown_adjacent_cases(Tuple<int, int> currentCasePos, Case[,] currentGrid, string field, float value)*/
-        public void Update_all_unknown_adjacent_cases(Tuple<int, int> currentCasePos, string field, float value)
+        /*KeyValuePair<string, JToken>*/
+        /*public void Update_all_unknown_adjacent_cases(Tuple<int, int> currentCasePos, string field, float value)*/
+        public void Update_all_unknown_adjacent_cases(Tuple<int, int> currentCasePos, KeyValuePair<string, JToken> rule, float value)
         {
+            string danger = rule.Value["danger"].ToString();
+            string goal = rule.Value["goal"].ToString();
 
-            Console.WriteLine("field : " + field);
             int x = currentCasePos.Item1;
             int y = currentCasePos.Item2;
 
@@ -109,27 +111,36 @@ namespace Chourbland
                         candidate.Set_border(true);
                         number_candidate++;
                         //Console.WriteLine("Case(" + xdx + "," + ydy + "): monster:" + candidate.Get_Monster() + "; cliff:" + candidate.Get_Cliff() + "; portal:" + candidate.Get_Portal());
-                        if (field == "monster")
+                        if (danger == "monster")
                         {
                             Console.WriteLine("Attention monstre !");
                             candidate.Set_Monster(value);
                         }
-                        if (field == "cliff")
+                        if (danger == "cliff")
                         {
                             Console.WriteLine("Attention cliff !");
                             candidate.Set_Cliff(value);
                         }
-                        if (field == "portal")
+                        if (danger == "portal")
                         {
                             Console.WriteLine("Attention portal !");
                             candidate.Set_Portal(value);
                         }
-                        if (field == "none")
+                        if (danger == "none")
                         {
-                            Console.WriteLine("Il n'y a rien en vue !");
-                            candidate.Set_Portal(0f);
+                            Console.WriteLine("Pas de danger !");
                             candidate.Set_Cliff(0f);
                             candidate.Set_Monster(0f);
+                        }
+                        if(goal == "none")
+                        {
+                            Console.WriteLine("Pas de portail !");
+                            candidate.Set_Portal(0f);
+                        }
+                        if(goal == "portal")
+                        {
+                            Console.WriteLine("Portail en vu !");
+                            candidate.Set_Portal(0f);
                         }
                     }
                 }
@@ -151,41 +162,6 @@ namespace Chourbland
             }
 
             return Tuple.Create(-1, -1);
-        }
-        // Chainage avant
-        public void Forward_chaining()
-        {
-            Console.WriteLine("Forward chaining");
-            var x = pos_agent.Item1;
-            var y = pos_agent.Item2;
-            var currentCase = beliefs[x, y];
-
-            Console.WriteLine("Case actuelle : " + x + " " + y);
-            if (currentCase.Get_Smell())
-            {
-                Console.WriteLine("There is a monster nearby");
-                Update_all_unknown_adjacent_cases(pos_agent, "monster", 1f);
-            }
-            if (beliefs[x, y].Get_Wind())
-            {
-                Console.WriteLine("There is a cliff nearby");
-                Update_all_unknown_adjacent_cases(pos_agent, "cliff", 1f);
-            }
-            if (beliefs[x, y].Get_Light())
-            {
-                Console.WriteLine("There is a portal nearby");
-                Update_all_unknown_adjacent_cases(pos_agent, "portal", 1f);
-                Update_all_unknown_adjacent_cases(pos_agent, "monster", 0f);
-                Update_all_unknown_adjacent_cases(pos_agent, "cliff", 0f);
-            }
-
-            // Si il n'y a rien
-            if ((!currentCase.Get_Wind()) && (!currentCase.Get_Light()) && (!currentCase.Get_Smell()))
-            {
-                Update_all_unknown_adjacent_cases(pos_agent, "portal", 0f);
-                Update_all_unknown_adjacent_cases(pos_agent, "monster", 0f);
-                Update_all_unknown_adjacent_cases(pos_agent, "cliff", 0f);
-            }
         }
 
         public Tuple<int, int> Move_agent()
@@ -343,7 +319,7 @@ namespace Chourbland
                 }
 
                 // On applique la règle choisie
-                Update_all_unknown_adjacent_cases(pos_agent, a_rule.Value["danger"].ToString(), 1f);
+                Update_all_unknown_adjacent_cases(pos_agent, a_rule, 1f);
 
             }
         }
