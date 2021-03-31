@@ -60,13 +60,11 @@ namespace Chourbland
         {
             // Récompense négative
             Set_performance_indicator(-10);
-
-            /*            if element on the cell == "monster"
-                            kill_monster(target_pos);
-            */
+            beliefs[target_pos.Item1,target_pos.Item2].Set_Monster(0f);
+            //il faut supprimer les odeurs correspondantes 
         }
 
-        public void Consider_shooting_rock()
+        public Tuple<int, int> Consider_shooting_rock()
         {
             float monsterProb = 0f;
             Tuple<int, int> target_pos = new Tuple<int, int>(-1,-1);
@@ -77,7 +75,7 @@ namespace Chourbland
                     //si il existe une case frontière sans niveau de danger, on peut déjà quitter cette fonction
                     if (box.Get_Monster() == 0f)
                     {
-                        return;
+                        return target_pos;
                     }
                     else
                     {
@@ -96,8 +94,12 @@ namespace Chourbland
                 }
             }
             Console.WriteLine("L'agent va tirer en :("+target_pos.Item1+","+target_pos.Item2+")");
-            Shoot_rock(target_pos);
-            return;
+            Tuple<int, int> no_target = new Tuple<int, int>(-1, -1);
+            if (target_pos != no_target)
+            {
+                Shoot_rock(target_pos);
+            }
+            return target_pos;
         }
 
         // On position l'agent
@@ -148,40 +150,40 @@ namespace Chourbland
                         //Console.WriteLine("Case(" + xdx + "," + ydy + "): monster:" + candidate.Get_Monster() + "; cliff:" + candidate.Get_Cliff() + "; portal:" + candidate.Get_Portal());
                         if (danger == "monster")
                         {
-                            Console.WriteLine("Attention monstre !");
+                            //Console.WriteLine("Attention monstre !");
                             candidate.Add_Monster(value);
                         }
                         if (danger == "cliff")
                         {
-                            Console.WriteLine("Attention cliff !");
+                            //Console.WriteLine("Attention cliff !");
                             candidate.Add_Cliff(value);
                         }
                         if (danger == "portal")
                         {
-                            Console.WriteLine("Attention portal !");
+                            //Console.WriteLine("Attention portal !");
                             candidate.Set_Portal(value);
                         }
                         if (danger == "none")
                         {
-                            Console.WriteLine("Pas de danger !");
+                            //Console.WriteLine("Pas de danger !");
                             candidate.Set_Cliff(0f);
                             candidate.Set_Monster(0f);
                         }
                         if(goal == "none")
                         {
-                            Console.WriteLine("Pas de portail !");
+                            //Console.WriteLine("Pas de portail !");
                             candidate.Set_Portal(0f);
                         }
                         if(goal == "portal")
                         {
-                            Console.WriteLine("Portail en vu !");
+                            //Console.WriteLine("Portail en vu !");
                             /*candidate.Set_Portal(0f);*/
                             candidate.Substract_cliff(-0.25f);
                         }
                     }
                 }
             }
-            Console.WriteLine("number_candidate : " + number_candidate);
+            //Console.WriteLine("number_candidate : " + number_candidate);
         }
         public static Tuple<int, int> CoordinatesOf(Case[,] grid, Case box)
         {
@@ -192,7 +194,7 @@ namespace Chourbland
             {
                 for (int y = 0; y < h; ++y)
                 {
-                    if (grid[x, y].Equals(box))
+                        if (grid[x, y].Equals(box))
                         return Tuple.Create(x, y);
                 }
             }
@@ -202,7 +204,7 @@ namespace Chourbland
 
         public Tuple<int, int> Move_agent()
         {
-            Console.WriteLine("Move");
+            //Console.WriteLine("Move");
             // Récompense négative
             Set_performance_indicator(-1);
 
@@ -214,7 +216,7 @@ namespace Chourbland
                 
                 if (box.Get_border()/* || box.Get_Visited()*/)
                 {
-                    Console.WriteLine("POS" + CoordinatesOf(beliefs, box) + " danger="+ (box.Get_Monster() + box.Get_Cliff()) + "\nMonster ?:" + box.Get_Smell() + box.Get_Monster() + "Cliff ?:" + box.Get_Wind() + box.Get_Cliff());
+                    //Console.WriteLine("POS" + CoordinatesOf(beliefs, box) + " danger="+ (box.Get_Monster() + box.Get_Cliff()) + "\nMonster ?:" + box.Get_Smell() + box.Get_Monster() + "Cliff ?:" + box.Get_Wind() + box.Get_Cliff());
                 }
                 //if ((box.Get_border() == true)&&(box.Get_Visited() == false))
                 /*Console.WriteLine("box.Get_border() : " + box.Get_border());*/
@@ -223,12 +225,12 @@ namespace Chourbland
                 {
                     number_iteration++;
                     //next_pos_agent = CoordinatesOf(beliefs, box);
-                    Console.WriteLine("box.Get_Visited() : " + next_pos_agent);
+                    //Console.WriteLine("box.Get_Visited() : " + next_pos_agent);
                     if ((box.Get_Monster() + box.Get_Cliff()) < safest)
                     {
                         safest = (box.Get_Monster() + box.Get_Cliff());
                         next_pos_agent = CoordinatesOf(beliefs, box);
-                        Console.WriteLine("Position monstre ! " + safest);
+                        //Console.WriteLine("Position monstre ! " + safest);
 
                     }
                     /*if (box.Get_Cliff() < safest)
@@ -331,7 +333,7 @@ namespace Chourbland
             var x = pos_agent.Item1;
             var y = pos_agent.Item2;
             var currentCase = beliefs[x, y];
-            Console.WriteLine("Case actuelle : " + x + " " + y);
+            //Console.WriteLine("Case actuelle : " + x + " " + y);
 
 
             // Récupération des règles du fichier Json
@@ -348,7 +350,7 @@ namespace Chourbland
             // On parcourt toutes les règles de la queue et on supprime celle marquée
             while (queue_rules.Count != 0)
             {
-                Console.WriteLine("Nombre de règle : " + queue_rules.Count());
+                //Console.WriteLine("Nombre de règle : " + queue_rules.Count());
 
                 // On Choisit une règle
                 KeyValuePair<string, JToken> a_rule = queue_rules.Dequeue();

@@ -16,9 +16,9 @@ namespace Chourbland
         Agent the_agent = new Agent();
 
         // Taille du tableau
-        int grid_size = 5;
+        int grid_size = 3;
 
-        Case[,] cases = new Case[5, 5];
+        Case[,] cases = new Case[3, 3];
         // Nombre de ligne de la grille
         int line_number = 0;
         
@@ -134,6 +134,7 @@ namespace Chourbland
                     }
                 }
             }
+            Update_Smell_Wind_and_Light();
             /*Draw_Grid();*/
         }
 
@@ -153,45 +154,143 @@ namespace Chourbland
             {
                 type_object = "cliff";
                 cases[new_x, new_y].Set_Cliff(1.0f);
-                if (new_x > 0)
-                    cases[new_x - 1, new_y].Set_Wind(true);
-                if (new_y > 0)
-                    cases[new_x, new_y - 1].Set_Wind(true);
-                if (new_x < cases.GetLength(0)-1)
-                    cases[new_x + 1, new_y].Set_Wind(true);
-                if (new_y < cases.GetLength(1)-1)
-                    cases[new_x, new_y + 1].Set_Wind(true);
+                //if (new_x > 0)
+                //    cases[new_x - 1, new_y].Set_Wind(true);
+                //if (new_y > 0)
+                //    cases[new_x, new_y - 1].Set_Wind(true);
+                //if (new_x < cases.GetLength(0)-1)
+                //    cases[new_x + 1, new_y].Set_Wind(true);
+                //if (new_y < cases.GetLength(1)-1)
+                //    cases[new_x, new_y + 1].Set_Wind(true);
             }
             // 20 % de chance->monster
             else if ((index_random_object_type >= 20) && (index_random_object_type <= 40))
             {
                 type_object = "monster";
                 cases[new_x, new_y].Set_Monster(1.0f);
-                if (new_x > 0)
-                    cases[new_x - 1, new_y].Set_Smell(true);
-                if(new_y > 0)
-                    cases[new_x, new_y-1].Set_Smell(true);
-                if (new_x < cases.GetLength(1)-1)
-                    cases[new_x + 1, new_y].Set_Smell(true);
-                if (new_y < cases.GetLength(0)-1)
-                    cases[new_x, new_y+1].Set_Smell(true);
+                //if (new_x > 0)
+                //    cases[new_x - 1, new_y].Set_Smell(true);
+                //if(new_y > 0)
+                //    cases[new_x, new_y-1].Set_Smell(true);
+                //if (new_x < cases.GetLength(1)-1)
+                //    cases[new_x + 1, new_y].Set_Smell(true);
+                //if (new_y < cases.GetLength(0)-1)
+                //    cases[new_x, new_y+1].Set_Smell(true);
             }
         }
 
+        public void Update_Smell_Wind_and_Light()
+        {
+            foreach (Case box in cases)
+            {
+                box.Set_Smell(false);
+                box.Set_Wind(false);
+                box.Set_Light(false);
+            }
+            foreach (Case box in cases)
+            {
+                Tuple<int, int> box_pos = CoordinatesOf(cases, box);
+                if (box.Get_Monster() > 0f)
+                {
+                    for (int dx = -1; dx <= 1; ++dx)
+                    {
+                        for (int dy = -1; dy <= 1; ++dy)
+                        {
+                            int xdx = box_pos.Item1 + dx;
+                            int ydy = box_pos.Item2 + dy;
+                            //On vérifie bien qu'on ne sort pas de la grille
+                            if ((xdx < 0) || (xdx > cases.GetLength(0) - 1) || (ydy < 0) ||
+                                (ydy > cases.GetLength(1) - 1))
+                            {
+                                continue;
+                            }
+
+                            if (((dx != 0 && dy == 0) || (dx == 0 && dy != 0)))
+                            {
+                                cases[xdx, ydy].Set_Smell(true);
+
+                            }
+                        }
+                    }
+                }
+                if (box.Get_Cliff() > 0f)
+                {
+                    for (int dx = -1; dx <= 1; ++dx)
+                    {
+                        for (int dy = -1; dy <= 1; ++dy)
+                        {
+                            int xdx = box_pos.Item1 + dx;
+                            int ydy = box_pos.Item2 + dy;
+                            //On vérifie bien qu'on ne sort pas de la grille
+                            if ((xdx < 0) || (xdx > cases.GetLength(0) - 1) || (ydy < 0) ||
+                                (ydy > cases.GetLength(1) - 1))
+                            {
+                                continue;
+                            }
+
+                            if (((dx != 0 && dy == 0) || (dx == 0 && dy != 0)))
+                            {
+                                cases[xdx, ydy].Set_Wind(true);
+
+                            }
+                        }
+                    }
+                }
+                if (box.Get_Portal()>0)
+                {
+                    for (int dx = -1; dx <= 1; ++dx)
+                    {
+                        for (int dy = -1; dy <= 1; ++dy)
+                        {
+                            int xdx = box_pos.Item1 + dx;
+                            int ydy = box_pos.Item2 + dy;
+                            //On vérifie bien qu'on ne sort pas de la grille
+                            if ((xdx < 0) || (xdx > cases.GetLength(0) - 1) || (ydy < 0) ||
+                                (ydy > cases.GetLength(1) - 1))
+                            {
+                                continue;
+                            }
+
+                            if (((dx != 0 && dy == 0) || (dx == 0 && dy != 0)))
+                            {
+                                cases[xdx, ydy].Set_Light(true);
+
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        public static Tuple<int, int> CoordinatesOf(Case[,] grid, Case box)
+        {
+            int w = grid.GetLength(0); // width
+            int h = grid.GetLength(1); // height
+
+            for (int x = 0; x < w; ++x)
+            {
+                for (int y = 0; y < h; ++y)
+                {
+                    if (grid[x, y].Equals(box))
+                        return Tuple.Create(x, y);
+                }
+            }
+
+            return Tuple.Create(-1, -1);
+        }
         public Tuple<int,int> Generate_Portal()
         {
             int portal_x = random.Next(line_number - 1);
             int portal_y = random.Next(line_number - 1);
             cases[portal_x, portal_y].Set_Portal(1.0f);
 
-            if (portal_x > 0)
-                cases[portal_x - 1, portal_y].Set_Light(true);
-            if (portal_y > 0)
-                cases[portal_x, portal_y - 1].Set_Light(true);
-            if (portal_x < cases.GetLength(1))
-                cases[portal_x + 1, portal_y].Set_Light(true);
-            if (portal_y < cases.GetLength(0))
-                cases[portal_x, portal_y + 1].Set_Light(true);
+            //if (portal_x > 0)
+            //    cases[portal_x - 1, portal_y].Set_Light(true);
+            //if (portal_y > 0)
+            //    cases[portal_x, portal_y - 1].Set_Light(true);
+            //if (portal_x < cases.GetLength(1))
+            //    cases[portal_x + 1, portal_y].Set_Light(true);
+            //if (portal_y < cases.GetLength(0))
+            //    cases[portal_x, portal_y + 1].Set_Light(true);
 
             return Tuple.Create(portal_x,portal_y);
         }
@@ -302,6 +401,13 @@ namespace Chourbland
             Console.WriteLine("");
 
             the_agent.Forward_chaining_new_version();
+            Tuple<int, int> smashedcase = the_agent.Consider_shooting_rock();
+            Tuple<int, int> error_value = new Tuple<int, int>(-1, -1);
+            if (smashedcase.Item1>=0 && smashedcase.Item2 >= 0)
+            {
+                cases[smashedcase.Item1, smashedcase.Item2].Set_Monster(0f);
+                Update_Smell_Wind_and_Light();
+            }
 
             // Nouvelle position de l'agent
             Tuple<int, int> new_agent_position = the_agent.Move_agent();
