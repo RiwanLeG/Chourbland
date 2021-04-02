@@ -44,9 +44,9 @@ namespace Chourbland
             Update_Image();
         }
 
-        public void Add_Monster(float a_monster)
+        public void Add_Monster(Case a_monster)
         {
-            _monster = a_monster + 0.25f;
+            _monster = a_monster.Get_Monster() + 0.25f;
             Update_Image();
         }
         public float Get_Monster()
@@ -59,19 +59,11 @@ namespace Chourbland
             Update_Image();
         }
 
-        public void Add_Cliff(float a_cliff)
+        public void Add_Cliff(Case a_cliff)
         {
-            _cliff = a_cliff + 0.25f ;
+            _cliff = a_cliff.Get_Cliff() + 0.25f ;
             /*Update_Image();*/
         }
-
-
-        public void Substract_cliff(float value)
-        {
-            _cliff += value;
-            /*Update_Image();*/
-        }
-
 
         public float Get_Cliff()
         {

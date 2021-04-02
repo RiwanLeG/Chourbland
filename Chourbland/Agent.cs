@@ -140,10 +140,12 @@ namespace Chourbland
                         if (danger == "monster")
                         {
                             candidate.Add_Monster(value);
+                            candidate.Add_Monster(candidate);
                         }
                         if (danger == "cliff")
                         {
                             candidate.Add_Cliff(value);
+                            candidate.Add_Cliff(candidate);
                         }
                         if (danger == "portal")
                         {
@@ -157,10 +159,6 @@ namespace Chourbland
                         if(goal == "none")
                         {
                             candidate.Set_Portal(0f);
-                        }
-                        if(goal == "portal")
-                        {
-                            candidate.Substract_cliff(-0.25f);
                         }
                     }
                 }
@@ -181,6 +179,24 @@ namespace Chourbland
                 }
             }
             return Tuple.Create(-1, -1);
+        }
+
+        public bool Check_possibilities()
+        {
+            bool is_possibilities = false;
+
+            foreach (Case box in beliefs)
+            {
+                if(box.Get_border())
+                {
+                    if(box.Get_Wind() == false)
+                    {
+                        is_possibilities = true;
+                    }
+                }
+            }
+            Console.WriteLine("is_possibilities" + is_possibilities);
+            return is_possibilities;
         }
 
         public Tuple<int, int> Move_agent()
