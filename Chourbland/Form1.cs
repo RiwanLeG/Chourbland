@@ -19,11 +19,9 @@ namespace Chourbland
         int grid_size = 3;
 
         Case[,] cases = new Case[3, 3];
+
         // Nombre de ligne de la grille
         int line_number = 0;
-        
-        // Elément de la grille
-        List<Element> elements = new List<Element>();
 
         // Position actuelle de l'agent
         Tuple<int, int> current_agent_position = Tuple.Create(0, 0);
@@ -57,14 +55,9 @@ namespace Chourbland
             // Clear the grid
             grid.Refresh();
 
-            // Clear la liste d'éléments
-            elements = new List<Element>();
-
             // Création de la grille visuelle
             Graphics graphic = grid.CreateGraphics();
-            Pen effective_pen = new Pen(Brushes.Black, 1);
             Pen pen = new Pen(Brushes.Black, 1);
-            Pen grass_pen = new Pen(Brushes.Black, 3);
             Font font = new Font("Arial", 10);
 
             float x = 0f;
