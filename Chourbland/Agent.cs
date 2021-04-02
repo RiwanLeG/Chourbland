@@ -139,12 +139,10 @@ namespace Chourbland
                         candidate.Set_border(true);
                         if (danger == "monster")
                         {
-                            candidate.Add_Monster(value);
                             candidate.Add_Monster(candidate);
                         }
                         if (danger == "cliff")
                         {
-                            candidate.Add_Cliff(value);
                             candidate.Add_Cliff(candidate);
                         }
                         if (danger == "portal")
