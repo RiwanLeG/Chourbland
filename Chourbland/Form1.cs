@@ -67,16 +67,13 @@ namespace Chourbland
             Pen grass_pen = new Pen(Brushes.Black, 3);
             Font font = new Font("Arial", 10);
 
-
-            
             float x = 0f;
             float y = 0f;
 
             // Taille des case
-            float size = (float)(100/cases.GetLength(0));
+            float size = (250/cases.GetLength(0));
 
             // lignes verticales
-            /*for (int i = 0; i < line_number; i++)*/
             for (int i = 0; i < cases.GetLength(0) +1; i++)
             {
                 graphic.DrawLine(pen, x, 0, x, cases.GetLength(0) * size);
@@ -105,9 +102,7 @@ namespace Chourbland
         // Créer une nouvelle grille : agent en position initial (0,0)
         public void Create_Grid(int a_grid_size)
         {
-            /*line_number = cases.GetLength(0);*/
             line_number = a_grid_size;
-
 
             cases = new Case[line_number, line_number];
             Initialize_Tab_Case();
@@ -119,63 +114,36 @@ namespace Chourbland
 
             // Positionnement de l'agent sur la grille
             Agent_position_on_the_grid();
-
-            /*Console.WriteLine("portal_position : " + portal_position);*/
-
+            
             // Pour chaque case : on génère ou non un élément
             for (int k = 0; k < cases.GetLength(0); k++)
             {
                 for (int n = 0; n < cases.GetLength(1); n++)
                 {
                     // pas de génération de monstre sur la position du portail et de l'agent
-                    if (((portal_position.Item1 != k) && (portal_position.Item2 != n)) && ((current_agent_position.Item1 != k) && (current_agent_position.Item2 != n))) {
-                        /*Console.WriteLine("Un Monstre " + k + " " + n);*/
+                    if (((portal_position.Item1 != k) && (portal_position.Item2 != n)) && ((current_agent_position.Item1 != k) && (current_agent_position.Item2 != n)))
+                    {
                         Generate_Monster_Or_Cliff(k,n);
                     }
                 }
             }
             Update_Smell_Wind_and_Light();
-            /*Draw_Grid();*/
         }
-
 
         // Génération d'éléments pour chacune des cases
         private void Generate_Monster_Or_Cliff(int new_x, int new_y)
         {
-
             int index_random_object_type = random.Next(100);
-
-            String type_object = " ";
-
-            /*Console.WriteLine("Position : " + new_x + " " + new_y);*/
 
             // 20% de chance -> colline
             if (index_random_object_type <= 20)
             {
-                type_object = "cliff";
                 cases[new_x, new_y].Set_Cliff(1.0f);
-                //if (new_x > 0)
-                //    cases[new_x - 1, new_y].Set_Wind(true);
-                //if (new_y > 0)
-                //    cases[new_x, new_y - 1].Set_Wind(true);
-                //if (new_x < cases.GetLength(0)-1)
-                //    cases[new_x + 1, new_y].Set_Wind(true);
-                //if (new_y < cases.GetLength(1)-1)
-                //    cases[new_x, new_y + 1].Set_Wind(true);
             }
             // 20 % de chance->monster
             else if ((index_random_object_type >= 20) && (index_random_object_type <= 40))
             {
-                type_object = "monster";
                 cases[new_x, new_y].Set_Monster(1.0f);
-                //if (new_x > 0)
-                //    cases[new_x - 1, new_y].Set_Smell(true);
-                //if(new_y > 0)
-                //    cases[new_x, new_y-1].Set_Smell(true);
-                //if (new_x < cases.GetLength(1)-1)
-                //    cases[new_x + 1, new_y].Set_Smell(true);
-                //if (new_y < cases.GetLength(0)-1)
-                //    cases[new_x, new_y+1].Set_Smell(true);
             }
         }
 
@@ -183,10 +151,12 @@ namespace Chourbland
         {
             foreach (Case box in cases)
             {
+                // On réinitialise les odeurs, vents et lumière
                 box.Set_Smell(false);
                 box.Set_Wind(false);
                 box.Set_Light(false);
             }
+
             foreach (Case box in cases)
             {
                 Tuple<int, int> box_pos = CoordinatesOf(cases, box);
@@ -199,20 +169,19 @@ namespace Chourbland
                             int xdx = box_pos.Item1 + dx;
                             int ydy = box_pos.Item2 + dy;
                             //On vérifie bien qu'on ne sort pas de la grille
-                            if ((xdx < 0) || (xdx > cases.GetLength(0) - 1) || (ydy < 0) ||
-                                (ydy > cases.GetLength(1) - 1))
+                            if (xdx < 0 || xdx > cases.GetLength(0) - 1 || ydy < 0 || ydy > cases.GetLength(1) - 1)
                             {
                                 continue;
                             }
 
-                            if (((dx != 0 && dy == 0) || (dx == 0 && dy != 0)))
+                            if (dx != 0 && dy == 0 || dx == 0 && dy != 0)
                             {
                                 cases[xdx, ydy].Set_Smell(true);
-
                             }
                         }
                     }
                 }
+
                 if (box.Get_Cliff() > 0f)
                 {
                     for (int dx = -1; dx <= 1; ++dx)
@@ -222,8 +191,7 @@ namespace Chourbland
                             int xdx = box_pos.Item1 + dx;
                             int ydy = box_pos.Item2 + dy;
                             //On vérifie bien qu'on ne sort pas de la grille
-                            if ((xdx < 0) || (xdx > cases.GetLength(0) - 1) || (ydy < 0) ||
-                                (ydy > cases.GetLength(1) - 1))
+                            if (xdx < 0 || xdx > cases.GetLength(0) - 1 || ydy < 0 || ydy > cases.GetLength(1) - 1)
                             {
                                 continue;
                             }
@@ -245,8 +213,7 @@ namespace Chourbland
                             int xdx = box_pos.Item1 + dx;
                             int ydy = box_pos.Item2 + dy;
                             //On vérifie bien qu'on ne sort pas de la grille
-                            if ((xdx < 0) || (xdx > cases.GetLength(0) - 1) || (ydy < 0) ||
-                                (ydy > cases.GetLength(1) - 1))
+                            if (xdx < 0 || xdx > cases.GetLength(0) - 1 || ydy < 0 || ydy > cases.GetLength(1) - 1)
                             {
                                 continue;
                             }
@@ -261,37 +228,30 @@ namespace Chourbland
                 }
             }
         }
+
+        //CoordinatesOf renvoie les coordonnées d'une case dans une grille
         public static Tuple<int, int> CoordinatesOf(Case[,] grid, Case box)
         {
-            int w = grid.GetLength(0); // width
-            int h = grid.GetLength(1); // height
+            int size = grid.GetLength(0);
 
-            for (int x = 0; x < w; ++x)
+            for (int x = 0; x < size; ++x)
             {
-                for (int y = 0; y < h; ++y)
+                for (int y = 0; y < size; ++y)
                 {
                     if (grid[x, y].Equals(box))
                         return Tuple.Create(x, y);
                 }
             }
-
             return Tuple.Create(-1, -1);
         }
+
         public Tuple<int,int> Generate_Portal()
         {
-            int portal_x = random.Next(line_number - 1);
-            int portal_y = random.Next(line_number - 1);
+            // On génère aléatoirement les coordonnées du portail
+            int portal_x = random.Next(line_number);
+            int portal_y = random.Next(line_number);
             cases[portal_x, portal_y].Set_Portal(1.0f);
-
-            //if (portal_x > 0)
-            //    cases[portal_x - 1, portal_y].Set_Light(true);
-            //if (portal_y > 0)
-            //    cases[portal_x, portal_y - 1].Set_Light(true);
-            //if (portal_x < cases.GetLength(1))
-            //    cases[portal_x + 1, portal_y].Set_Light(true);
-            //if (portal_y < cases.GetLength(0))
-            //    cases[portal_x, portal_y + 1].Set_Light(true);
-
+            
             return Tuple.Create(portal_x,portal_y);
         }
 
@@ -303,21 +263,6 @@ namespace Chourbland
 
             current_agent_position = Tuple.Create(0, 0);
             cases[current_agent_position.Item1, current_agent_position.Item2].Set_Agent(true);
-        }
-
-        // Fonction de débugage
-        private void Display_Grid(Case[,] a_cases)
-        {
-
-            // Pour chaque case : on génère ou non un élément
-            for (int k = 0; k < a_cases.GetLength(0); k++)
-            {
-                for (int n = 0; n < a_cases.GetLength(1); n++)
-                {
-                    //Console.Write(a_cases[k, n].Get_Light() + " ");
-                }
-                //Console.WriteLine("");
-            }
         }
 
         private void Update_Agent_position(Tuple<int,int> new_agent_position)
@@ -350,24 +295,19 @@ namespace Chourbland
         {
             bool restart_the_grid = false;
             // Test si agent encore en vie
-            if ((cases[agent_position.Item1, agent_position.Item2].Get_Cliff() == 1.0f) || (cases[agent_position.Item1, agent_position.Item2].Get_Monster() == 1.0f))
+            if (cases[agent_position.Item1, agent_position.Item2].Get_Cliff() == 1.0f || cases[agent_position.Item1, agent_position.Item2].Get_Monster() == 1.0f)
             {
                 // Fonction supprimer l'agent + regénération de la grille
-                Console.WriteLine("DEFEAT !");
                 restart_the_grid = true;
 
                 // Récompense négative
                 the_agent.Set_performance_indicator(-10 * grid_size * grid_size);
 
             }
-            if ((cases[agent_position.Item1, agent_position.Item2]).Get_Portal() == 1.0f)
+            if (cases[agent_position.Item1, agent_position.Item2].Get_Portal() == 1.0f)
             {
-                // Pop up victoire + regénération de la grile
-                Console.WriteLine("VICTORY !");
-
                 // Récompense positive
                 the_agent.Set_performance_indicator(10* grid_size* grid_size);
-
 
                 // On augmente la taille de la grille
                 grid_size++;
@@ -392,18 +332,10 @@ namespace Chourbland
 
         private void button2_Click(object sender, EventArgs e)
         {
-
-            /*Agent the_agent = new Agent(cases.GetLength(0), cases.GetLength(1), cases[current_agent_position.Item1, current_agent_position.Item2], current_agent_position);*/
-
-            // On applique le chainage avant
-            /*the_agent.Forward_chaining();*/
-
-            Console.WriteLine("");
-
             the_agent.Forward_chaining_new_version();
             Tuple<int, int> smashedcase = the_agent.Consider_shooting_rock();
             Tuple<int, int> error_value = new Tuple<int, int>(-1, -1);
-            if (smashedcase.Item1>=0 && smashedcase.Item2 >= 0)
+            if (!smashedcase.Equals(error_value))
             {
                 cases[smashedcase.Item1, smashedcase.Item2].Set_Monster(0f);
                 Update_Smell_Wind_and_Light();
@@ -415,50 +347,7 @@ namespace Chourbland
             // Mise à jour graphique et dans le tableau cases de la position de l'agent
             Update_Agent_position(new_agent_position);
         }
-
-
-
-
-        // Bouton de déplacement pour test -----------------------------------
-        private void button6_Click(object sender, EventArgs e)
-        {
-            Tuple<int, int> new_agent_position;
-            if (current_agent_position.Item2 > 0)
-            {
-                new_agent_position = Tuple.Create(current_agent_position.Item1, current_agent_position.Item2 - 1);
-                Update_Agent_position(new_agent_position);
-            }
-        }
-
-        private void button3_Click(object sender, EventArgs e)
-        {
-            Tuple<int, int> new_agent_position;
-            if (current_agent_position.Item1 > 0)
-            {
-                new_agent_position = Tuple.Create(current_agent_position.Item1 - 1, current_agent_position.Item2);
-                Update_Agent_position(new_agent_position);
-            }
-        }
-
-        private void button4_Click(object sender, EventArgs e)
-        {
-            Tuple<int, int> new_agent_position;
-            if (current_agent_position.Item1 < cases.GetLength(0) - 1) { 
-                new_agent_position = Tuple.Create(current_agent_position.Item1 + 1, current_agent_position.Item2);
-                Update_Agent_position(new_agent_position);
-            }
-        }
-
-        private void button5_Click(object sender, EventArgs e)
-        {
-            Tuple<int, int> new_agent_position;
-            if (current_agent_position.Item2 < cases.GetLength(1) - 1)
-            {
-                new_agent_position = Tuple.Create(current_agent_position.Item1, current_agent_position.Item2 + 1);
-                Update_Agent_position(new_agent_position);
-            }
-        }
-
+        
         // Test de la fonction de récupération du fichier Json
         private void button7_Click(object sender, EventArgs e)
         {
