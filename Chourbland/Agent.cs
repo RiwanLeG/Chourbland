@@ -73,7 +73,7 @@ namespace Chourbland
                 if (box.Get_border())
                 {
                     //si il existe une case frontière sans niveau de danger, on peut déjà quitter cette fonction
-                    if (box.Get_Monster() == 0f)
+                    if ((box.Get_Monster() == 0f) && (box.Get_Cliff() == 0f))
                     {
                         return target_pos;
                     }
@@ -84,6 +84,7 @@ namespace Chourbland
                         {
                             monsterProb = box.Get_Monster();
                             target_pos = CoordinatesOf(beliefs, box);
+                            Console.WriteLine("monster prob =" + box.Get_Monster() + "targetpos:" + target_pos);
                         }
                     }
                 }
@@ -95,7 +96,7 @@ namespace Chourbland
             }
             Console.WriteLine("L'agent va tirer en :("+target_pos.Item1+","+target_pos.Item2+")");
             Tuple<int, int> no_target = new Tuple<int, int>(-1, -1);
-            if (target_pos != no_target)
+            if (!target_pos.Equals(no_target))
             {
                 Shoot_rock(target_pos);
             }
@@ -150,22 +151,18 @@ namespace Chourbland
                         //Console.WriteLine("Case(" + xdx + "," + ydy + "): monster:" + candidate.Get_Monster() + "; cliff:" + candidate.Get_Cliff() + "; portal:" + candidate.Get_Portal());
                         if (danger == "monster")
                         {
-                            //Console.WriteLine("Attention monstre !");
-                            candidate.Add_Monster(value);
+                            candidate.Add_Monster(candidate);
                         }
                         if (danger == "cliff")
                         {
-                            //Console.WriteLine("Attention cliff !");
-                            candidate.Add_Cliff(value);
+                            candidate.Add_Cliff(candidate);
                         }
                         if (danger == "portal")
                         {
-                            //Console.WriteLine("Attention portal !");
                             candidate.Set_Portal(value);
                         }
                         if (danger == "none")
                         {
-                            //Console.WriteLine("Pas de danger !");
                             candidate.Set_Cliff(0f);
                             candidate.Set_Monster(0f);
                         }
@@ -173,12 +170,6 @@ namespace Chourbland
                         {
                             //Console.WriteLine("Pas de portail !");
                             candidate.Set_Portal(0f);
-                        }
-                        if(goal == "portal")
-                        {
-                            //Console.WriteLine("Portail en vu !");
-                            /*candidate.Set_Portal(0f);*/
-                            candidate.Substract_cliff(-0.25f);
                         }
                     }
                 }
@@ -202,6 +193,24 @@ namespace Chourbland
             return Tuple.Create(-1, -1);
         }
 
+        public bool Check_possibilities()
+        {
+            bool is_possibilities = false;
+
+            foreach (Case box in beliefs)
+            {
+                if(box.Get_border())
+                {
+                    if(box.Get_Wind() == false)
+                    {
+                        is_possibilities = true;
+                    }
+                }
+            }
+            Console.WriteLine("is_possibilities" + is_possibilities);
+            return is_possibilities;
+        }
+
         public Tuple<int, int> Move_agent()
         {
             //Console.WriteLine("Move");
@@ -211,6 +220,7 @@ namespace Chourbland
             Tuple<int, int> next_pos_agent = new Tuple<int, int>(0, 0);
             float safest = 1.0f;
             int number_iteration = 0;
+            Check_possibilities();
             foreach (Case box in beliefs)
             {
                 
