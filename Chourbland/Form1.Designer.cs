@@ -83,8 +83,10 @@ namespace Chourbland
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label2.Location = new System.Drawing.Point(683, 257);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(0, 22);
+            this.label2.Size = new System.Drawing.Size(20, 22);
             this.label2.TabIndex = 4;
+            this.label2.Text = "0";
+            this.label2.Click += new System.EventHandler(this.label2_Click);
             // 
             // Form1
             // 
