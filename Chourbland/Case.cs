@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,7 +24,7 @@ namespace Chourbland
 
         private bool _border = false;
 
-        public string Image = " ";
+        public Image image;
 
         public Case()
         {
@@ -125,38 +126,65 @@ namespace Chourbland
         {
             if (_agent)
             {
-                Image = "a";
+                image = Chourbland.Resource1.link_static;
             }
             else if (_monster == 1.0f)
             {
-                Image = "m";
+                image = Chourbland.Resource1.suli;
             }
             else if (_cliff == 1.0f)
             {
-                Image = "c";
+                image = Chourbland.Resource1.cliff;
             }
             else if (_portal == 1.0f)
             {
-                Image = "p";
+                image = Chourbland.Resource1.portal;
             }
             else if (_smell)
             {
-                Image = "s";
+                image = Chourbland.Resource1.poop;
             }
             else if (_wind)
             {
-                Image = "w";
-            }
-            else if (_light)
-            {
-                Image = "l";
+                image = Chourbland.Resource1.wind;
             }
             else
             {
-                Image = " ";
+                image = Chourbland.Resource1.back;
             }
             
         }
-        
+
+/*        private bool _agent = false;
+
+        private float _monster = 0f;
+        private bool _smell = false;
+
+        private float _cliff = 0f;
+        private bool _wind = false;
+
+        private float _portal = 0f;
+        private bool _light = false;
+
+        private bool _visited = false;
+
+        private bool _border = false;
+
+        public string Image = " ";*/
+
+        public void Display_case()
+        {
+            Console.WriteLine();
+            Console.WriteLine("Agent is here : " + _agent );
+            Console.WriteLine("Monster is here : " + _monster );
+            Console.WriteLine("Cliff is here : " + _cliff );
+            Console.WriteLine("Wind is here : " + _wind );
+            Console.WriteLine("Light is here : " + _light );
+            Console.WriteLine("Smell is here : " + _smell );
+            Console.WriteLine("Border is here : " + _border);
+            Console.WriteLine("The case has been visited : " + _visited);
+            Console.WriteLine("Image : " + image);
+            Console.WriteLine();
+        }
     }
 }

@@ -23,6 +23,7 @@ namespace Chourbland
         // Nombre de ligne de la grille
         int line_number = 0;
 
+        public int score = 0;
         // Position actuelle de l'agent
         Tuple<int, int> current_agent_position = Tuple.Create(0, 0);
 
@@ -57,14 +58,16 @@ namespace Chourbland
 
             // Création de la grille visuelle
             Graphics graphic = grid.CreateGraphics();
-            Pen pen = new Pen(Brushes.Black, 1);
+            Pen effective_pen = new Pen(Brushes.LightGreen, 3);
+            Pen pen = new Pen(Brushes.LightGreen, 1);
+            Pen grass_pen = new Pen(Brushes.LightGreen, 3);
             Font font = new Font("Arial", 10);
 
             float x = 0f;
             float y = 0f;
 
             // Taille des case
-            float size = (250/cases.GetLength(0));
+            float size = (float)(100/cases.GetLength(0));
 
             // lignes verticales
             for (int i = 0; i < cases.GetLength(0) +1; i++)
@@ -87,7 +90,7 @@ namespace Chourbland
             {
                 for (int n = 0; n < cases.GetLength(1); n++)
                 {
-                    graphic.DrawString(cases[k, n].Image.ToString(), font, Brushes.Black, k * size, n * size);
+                    graphic.DrawImage(cases[k, n].image, k * size, n * size, size-1, size-1);
                 }
             }
         }
@@ -106,7 +109,7 @@ namespace Chourbland
             Tuple<int,int> portal_position = Generate_Portal();
 
             // Positionnement de l'agent sur la grille
-            Agent_position_on_the_grid(performance);
+            Agent_position_on_the_grid();
             
             // Pour chaque case : on génère ou non un élément
             for (int k = 0; k < cases.GetLength(0); k++)
@@ -203,18 +206,13 @@ namespace Chourbland
                     {
                         for (int dy = -1; dy <= 1; ++dy)
                         {
+                            cases[box_pos.Item1, box_pos.Item2].Set_Light(true);
                             int xdx = box_pos.Item1 + dx;
                             int ydy = box_pos.Item2 + dy;
                             //On vérifie bien qu'on ne sort pas de la grille
                             if (xdx < 0 || xdx > cases.GetLength(0) - 1 || ydy < 0 || ydy > cases.GetLength(1) - 1)
                             {
                                 continue;
-                            }
-
-                            if (((dx != 0 && dy == 0) || (dx == 0 && dy != 0)))
-                            {
-                                cases[xdx, ydy].Set_Light(true);
-
                             }
                         }
                     }
@@ -249,26 +247,27 @@ namespace Chourbland
         }
 
         // Restart la position de l'agent
-        public void Agent_position_on_the_grid(int performance)
+        public void Agent_position_on_the_grid()
         {
             // Initialisation de l'agent à la case (0,0)
-            the_agent = new Agent(cases.GetLength(0), cases.GetLength(1), cases[current_agent_position.Item1, current_agent_position.Item2], current_agent_position,performance);
+            the_agent = new Agent(cases.GetLength(0), cases.GetLength(1), cases[current_agent_position.Item1, current_agent_position.Item2], current_agent_position,score);
 
             current_agent_position = Tuple.Create(0, 0);
             cases[current_agent_position.Item1, current_agent_position.Item2].Set_Agent(true);
         }
 
-        private void Update_Agent_position(Tuple<int,int> new_agent_position,int performance)
+        private void Update_Agent_position(Tuple<int,int> new_agent_position)
         {
             // Test de victoire ou de défaite de l'agent
             bool restard_grid = Victory_And_Defeat_Test(new_agent_position);
 
             // Suppression de l'ancienne position de l'agent
-            cases[current_agent_position.Item1, current_agent_position.Item2].Set_Agent(false);
+            cases[current_agent_position.Item1, current_agent_position.Item2].Set_Agent(false); 
+            score = the_agent.performance_indicator;
             if (restard_grid)
             {
                 current_agent_position = Tuple.Create(0, 0);
-                Create_Grid(grid_size,performance);
+                Create_Grid(grid_size,score);
             }
             else
             {
@@ -288,19 +287,20 @@ namespace Chourbland
         {
             bool restart_the_grid = false;
             // Test si agent encore en vie
+            int value = 10 * grid_size * grid_size;
             if (cases[agent_position.Item1, agent_position.Item2].Get_Cliff() == 1.0f || cases[agent_position.Item1, agent_position.Item2].Get_Monster() == 1.0f)
             {
                 // Fonction supprimer l'agent + regénération de la grille
                 restart_the_grid = true;
 
                 // Récompense négative
-                the_agent.Set_performance_indicator(-10 * grid_size * grid_size);
+                the_agent.Set_performance_indicator(-value);
 
             }
             if (cases[agent_position.Item1, agent_position.Item2].Get_Portal() == 1.0f)
             {
                 // Récompense positive
-                the_agent.Set_performance_indicator(10* grid_size* grid_size);
+                the_agent.Set_performance_indicator(value);
 
                 // On augmente la taille de la grille
                 grid_size++;
@@ -316,7 +316,7 @@ namespace Chourbland
             Create_Grid(grid_size,0);
 
             // Test si l'agent spawn sur le portail
-            Update_Agent_position(current_agent_position,0);
+            Update_Agent_position(current_agent_position);
 
             // On dessine la grille
             Draw_Grid();
@@ -333,13 +333,14 @@ namespace Chourbland
                 cases[smashedcase.Item1, smashedcase.Item2].Set_Monster(0f);
                 Update_Smell_Wind_and_Light();
             }
-            int performance_agent = the_agent.performance_indicator;
+            //int performance_agent = the_agent.performance_indicator;
             // Nouvelle position de l'agent
             Tuple<int, int> new_agent_position = the_agent.Move_agent();
 
 
             // Mise à jour graphique et dans le tableau cases de la position de l'agent
-            Update_Agent_position(new_agent_position, performance_agent);
+            Update_Agent_position(new_agent_position);
+            score = the_agent.performance_indicator;
         }
         
         // Test de la fonction de récupération du fichier Json
