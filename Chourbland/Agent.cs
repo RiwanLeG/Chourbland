@@ -88,10 +88,6 @@ namespace Chourbland
                     }
                 }
                 //Les cases non-comprises dans la frontière ne nous intéressent pas
-                else
-                {
-                    continue;
-                }
             }
             Console.WriteLine("L'agent va tirer en :("+target_pos.Item1+","+target_pos.Item2+")");
             Tuple<int, int> no_target = new Tuple<int, int>(-1, -1);
@@ -256,10 +252,6 @@ namespace Chourbland
                         continue;
                     }
                     Case candidate = beliefs[xdx, ydy];
-/*                    if ((dx != 0 && dy == 0) || (dx == 0 && dy != 0) && !candidate.Get_Visited())
-                    {
-                        candidate.Set_border(true);
-                    }*/
                 }
             }
             /*            Console.WriteLine("next_pos_agent : " + next_pos_agent);
@@ -365,6 +357,207 @@ namespace Chourbland
                 Update_all_unknown_adjacent_cases(pos_agent, a_rule, 0.25f);
 
             }
+        }
+
+        public void Apply_proba(Case the_case)
+        {
+            // Liste des cases vent
+            List<Tuple<int,int>> wind_cases = new List<Tuple<int,int>>();
+
+            // Liste des case frontières
+            List<Tuple<int, int>> border_cases = new List< Tuple<int, int>>();
+            for (int x=0; x<beliefs.GetLength(0); x++)
+            {
+                for(int y=0; y<beliefs.GetLength(0); y++)
+                {
+                    if (beliefs[x,y].Get_Wind())
+                    {
+                        wind_cases.Add(Tuple.Create(x,y));
+                    }
+                    else if (beliefs[x, y].Get_border())
+                    {
+                        border_cases.Add(Tuple.Create(x,y));
+                    }
+                }
+            }
+
+            // Liste de scénarios
+            /*List<List<Tuple<bool, Tuple<int, int>>>> scenarios = new List<List<Tuple<bool, Tuple<int, int>>>>();*/
+
+            int[] an_array = new int[border_cases.Count()];
+
+            // Fonction qui créée tous les scénarios possibles
+            an_array = generateAllBinaryStrings(border_cases.Count(), an_array, 0);
+
+            int i = 0;
+
+            List<List<bool>> several_scenarios = new List<List<bool>>();
+            List<bool> a_scenario = new List<bool>();
+
+            foreach (int el in an_array)
+            {
+                if (i< border_cases.Count) {
+                    i++;
+                    a_scenario[i] = Convert_int_to_bool(el);
+                    continue;
+                }
+
+                several_scenarios.Add(a_scenario);
+                a_scenario = new List<bool>();
+            }
+
+            foreach (var scenario in several_scenarios)
+            {
+                foreach(var el in scenario)
+                {
+                    Console.Write(el + " ");
+                }
+                Console.WriteLine(" ");
+            }
+
+
+            foreach(Tuple<int,int> a_case in wind_cases)
+            {
+
+                for (int a=0; a<several_scenarios.Count; a++)
+                {
+                    bool is_there_cliff_near = false;
+                    for (int b=0; b< several_scenarios[a].Count; b++)
+                    {
+                        int x_case = a_case.Item1;
+                        int y_case = a_case.Item2;
+                        if (y_case > 0) { 
+                            Tuple<int, int> case_up = Tuple.Create(x_case, y_case-1);
+                            if (case_up.Equals(border_cases[b]) && (several_scenarios[a][b] == true))
+                            {
+                                is_there_cliff_near = true;
+                            }
+                        }
+
+                        if (y_case < beliefs.GetLength(1))
+                        {
+                            Tuple<int, int> case_down = Tuple.Create(x_case, y_case + 1);
+                            if (case_down.Equals(border_cases[b]) && (several_scenarios[a][b] == true))
+                            {
+                                is_there_cliff_near = true;
+                            }
+                        }
+
+                        if (x_case < beliefs.GetLength(0))
+                        {
+                            Tuple<int, int> case_right = Tuple.Create(x_case + 1, y_case);
+                            if (case_right.Equals(border_cases[b]) && (several_scenarios[a][b] == true))
+                            {
+                                is_there_cliff_near = true;
+                            }
+                        }
+
+                        if (x_case > 0)
+                        {
+                            Tuple<int, int> case_left = Tuple.Create(x_case - 1, y_case);
+                            if (case_left.Equals(border_cases[b]) && (several_scenarios[a][b] == true))
+                            {
+                                is_there_cliff_near = true;
+                            }
+                        }
+
+
+                    }
+
+                    if (!is_there_cliff_near)
+                    {
+                        several_scenarios.RemoveAt(a);
+                    }
+                }
+            }
+
+            // Cacul
+
+            Tuple<int,int> case_coordinate = CoordinatesOf(beliefs, the_case);
+
+            int index_case = 0;
+
+            for(int c = 0; c< border_cases.Count; c++)
+            {
+                if (case_coordinate.Equals(border_cases[c]))
+                {
+                    index_case = c;
+                }
+            }
+
+            // Calcul
+            float probability_cliff_not_normalized = 0f;
+            float probability_not_cliff_not_normalized = 0f;
+
+
+
+            foreach(var scenario in several_scenarios)
+            {
+                if(scenario[index_case] == true) { 
+                    int number_of_cliff_up = 0;
+                    int number_of_cliff_down = 0;
+                    for (int d=0; d < scenario.Count; d++)
+                    {
+                        if(scenario[d] == true)
+                        {
+                            number_of_cliff_up++;
+                        }
+                        else
+                        {
+                            number_of_cliff_down++;
+                        }
+                    }
+                    probability_cliff_not_normalized += (float)(Math.Pow(0.2, number_of_cliff_up) * Math.Pow(0.8, number_of_cliff_up));
+                }
+                else
+                {
+                    int number_of_cliff_up = 0;
+                    int number_of_cliff_down = 0;
+                    for (int d = 0; d < scenario.Count; d++)
+                    {
+                        if (scenario[d] == true)
+                        {
+                            number_of_cliff_up++;
+                        }
+                        else
+                        {
+                            number_of_cliff_down++;
+                        }
+                    }
+                    probability_not_cliff_not_normalized += (float)(Math.Pow(0.2, number_of_cliff_up) * Math.Pow(0.8, number_of_cliff_up));
+                }
+            }
+            float alpha = 1 / (probability_not_cliff_not_normalized+ probability_cliff_not_normalized);
+            float probability_cliff_normalized = alpha* probability_cliff_not_normalized;
+            float probability_not_cliff_normalized = alpha * probability_not_cliff_not_normalized;
+
+
+            // Application de la probabilité
+            the_case.Set_Cliff(probability_cliff_normalized);
+        }
+
+        private bool Convert_int_to_bool(int a_value)
+        {
+            return a_value.Equals(1);
+        }
+
+
+        // Fonction permettant de générer des scénarios binaire en fonction du nombre de frontière passé en paramètre
+        public int[] generateAllBinaryStrings(int n,
+                                    int[] arr, int i)
+        {
+            if (i == n)
+            {
+                return arr;
+            }
+
+            arr[i] = 0;
+            generateAllBinaryStrings(n, arr, i + 1);
+
+            arr[i] = 1;
+            generateAllBinaryStrings(n, arr, i + 1);
+
+            return arr;
         }
 
     }

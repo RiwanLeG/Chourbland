@@ -279,8 +279,9 @@ namespace Chourbland
         }
         public Tuple<int,int> Generate_Portal()
         {
-            int portal_x = random.Next(line_number - 1);
-            int portal_y = random.Next(line_number - 1);
+            int portal_x = random.Next(1, line_number - 1);
+            int portal_y = random.Next(1, line_number - 1);
+
             cases[portal_x, portal_y].Set_Portal(1.0f);
 
             //if (portal_x > 0)
@@ -330,6 +331,7 @@ namespace Chourbland
             if (restard_grid)
             {
                 current_agent_position = Tuple.Create(0, 0);
+                Console.WriteLine("On relance une grille");
                 Create_Grid(grid_size);
             }
             else
@@ -402,7 +404,7 @@ namespace Chourbland
 
             the_agent.Forward_chaining_new_version();
             Tuple<int, int> smashedcase = the_agent.Consider_shooting_rock();
-            Tuple<int, int> error_value = new Tuple<int, int>(-1, -1);
+
             if (smashedcase.Item1>=0 && smashedcase.Item2 >= 0)
             {
                 cases[smashedcase.Item1, smashedcase.Item2].Set_Monster(0f);
@@ -463,7 +465,13 @@ namespace Chourbland
         private void button7_Click(object sender, EventArgs e)
         {
             Agent the_agent = new Agent(cases.GetLength(0), cases.GetLength(1), cases[current_agent_position.Item1, current_agent_position.Item2], current_agent_position);
-            the_agent.Load_Json();
+
+            /*            int n = 4;
+
+                        int[] arr = new int[n];
+                        the_agent.generateAllBinaryStrings(3 , arr, 0);*/
+
+            the_agent.Apply_proba();
         }
 
         private void Form1_Load(object sender, EventArgs e)
