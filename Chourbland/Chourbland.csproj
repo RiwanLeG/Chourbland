@@ -51,7 +51,6 @@
   <ItemGroup>
     <Compile Include="Agent.cs" />
     <Compile Include="Case.cs" />
-    <Compile Include="Element.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

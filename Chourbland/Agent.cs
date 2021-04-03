@@ -29,12 +29,13 @@ namespace Chourbland
         // Position de l'agent
         public Tuple<int, int> pos_agent = new Tuple<int, int>(0, 0);
 
-        private int performance_indicator = 0;
+        public int performance_indicator = 0;
 
-        public Agent(int length, int width, Case initialposition_case, Tuple<int, int> initialPos)
+        public Agent(int length, int width, Case initialposition_case, Tuple<int, int> initialPos, int performance)
         {
             pos_agent = initialPos;
             beliefs = new Case[length, width];
+            performance_indicator = performance;
             for (int column = 0; column < width; column++)
             {
                 for (int row = 0; row < length; row++)
@@ -53,7 +54,7 @@ namespace Chourbland
         public void Set_performance_indicator(int value)
         {
             performance_indicator += value;
-            Console.WriteLine("performance_indicator : " + performance_indicator);
+            Console.WriteLine("performance_indicator in agent.cs : " + performance_indicator);
         }
 
         public void Shoot_rock(Tuple<int, int> target_pos)
@@ -187,7 +188,7 @@ namespace Chourbland
             {
                 if(box.Get_border())
                 {
-                    if(box.Get_Wind() == false)
+                    if(box.Get_Cliff() == 0f)
                     {
                         is_possibilities = true;
                     }
@@ -201,6 +202,18 @@ namespace Chourbland
         {
             // Récompense négative
             Set_performance_indicator(-1);
+
+            if (!Check_possibilities())
+            {
+                foreach (var candidate in beliefs)
+                {
+                    if (candidate.Get_border())
+                    {
+                        Console.WriteLine("Apply_probbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
+                        Apply_proba(candidate);
+                    }
+                }
+            }
 
             Tuple<int, int> next_pos_agent = new Tuple<int, int>(0, 0);
             float safest = 1.0f;
@@ -296,5 +309,210 @@ namespace Chourbland
             }
         }
 
+        public void Apply_proba(Case the_case)
+        {
+            // Liste des cases vent
+            List<Tuple<int, int>> wind_cases = new List<Tuple<int, int>>();
+
+            // Liste des case frontières
+            List<Tuple<int, int>> border_cases = new List<Tuple<int, int>>();
+            for (int x = 0; x < beliefs.GetLength(0); x++)
+            {
+                for (int y = 0; y < beliefs.GetLength(0); y++)
+                {
+                    if (beliefs[x, y].Get_Wind())
+                    {
+                        wind_cases.Add(Tuple.Create(x, y));
+                    }
+                    else if (beliefs[x, y].Get_border())
+                    {
+                        border_cases.Add(Tuple.Create(x, y));
+                    }
+                }
+            }
+
+            // Liste de scénarios
+            /*List<List<Tuple<bool, Tuple<int, int>>>> scenarios = new List<List<Tuple<bool, Tuple<int, int>>>>();*/
+
+            int[] an_array = new int[border_cases.Count()];
+
+            // Fonction qui créée tous les scénarios possibles
+            an_array = generateAllBinaryStrings(border_cases.Count(), an_array, 0);
+
+            int i = 0;
+
+            List<List<bool>> several_scenarios = new List<List<bool>>();
+            List<bool> a_scenario = new List<bool>();
+
+            foreach (int el in an_array)
+            {
+                if (i < border_cases.Count)
+                {
+                    i++;
+                    a_scenario.Add(Convert_int_to_bool(el));
+                    continue;
+                }
+
+                several_scenarios.Add(a_scenario);
+                a_scenario = new List<bool>();
+                i = 0;
+            }
+
+            foreach (var scenario in several_scenarios)
+            {
+                foreach (var el in scenario)
+                {
+                    Console.Write(el + " ");
+                }
+                Console.WriteLine(" ");
+            }
+
+
+            foreach (Tuple<int, int> a_case in wind_cases)
+            {
+
+                for (int a = 0; a < several_scenarios.Count; a++)
+                {
+                    bool is_there_cliff_near = false;
+                    for (int b = 0; b < several_scenarios[a].Count; b++)
+                    {
+                        int x_case = a_case.Item1;
+                        int y_case = a_case.Item2;
+                        if (y_case > 0)
+                        {
+                            Tuple<int, int> case_up = Tuple.Create(x_case, y_case - 1);
+                            if (case_up.Equals(border_cases[b]) && (several_scenarios[a][b] == true))
+                            {
+                                is_there_cliff_near = true;
+                            }
+                        }
+
+                        if (y_case < beliefs.GetLength(1))
+                        {
+                            Tuple<int, int> case_down = Tuple.Create(x_case, y_case + 1);
+                            if (case_down.Equals(border_cases[b]) && (several_scenarios[a][b] == true))
+                            {
+                                is_there_cliff_near = true;
+                            }
+                        }
+
+                        if (x_case < beliefs.GetLength(0))
+                        {
+                            Tuple<int, int> case_right = Tuple.Create(x_case + 1, y_case);
+                            if (case_right.Equals(border_cases[b]) && (several_scenarios[a][b] == true))
+                            {
+                                is_there_cliff_near = true;
+                            }
+                        }
+
+                        if (x_case > 0)
+                        {
+                            Tuple<int, int> case_left = Tuple.Create(x_case - 1, y_case);
+                            if (case_left.Equals(border_cases[b]) && (several_scenarios[a][b] == true))
+                            {
+                                is_there_cliff_near = true;
+                            }
+                        }
+
+
+                    }
+
+                    if (!is_there_cliff_near)
+                    {
+                        several_scenarios.RemoveAt(a);
+                    }
+                }
+            }
+
+            // Cacul
+
+            Tuple<int, int> case_coordinate = CoordinatesOf(beliefs, the_case);
+
+            int index_case = 0;
+
+            for (int c = 0; c < border_cases.Count; c++)
+            {
+                if (case_coordinate.Equals(border_cases[c]))
+                {
+                    index_case = c;
+                }
+            }
+
+            // Calcul
+            float probability_cliff_not_normalized = 0f;
+            float probability_not_cliff_not_normalized = 0f;
+
+
+
+            foreach (var scenario in several_scenarios)
+            {
+                if (scenario[index_case] == true)
+                {
+                    Console.WriteLine("Test de passage");
+                    int number_of_cliff_up = 0;
+                    int number_of_cliff_down = 0;
+                    for (int d = 0; d < scenario.Count; d++)
+                    {
+                        if (scenario[d] == true)
+                        {
+                            number_of_cliff_up++;
+                        }
+                        else
+                        {
+                            number_of_cliff_down++;
+                        }
+                    }
+                    probability_cliff_not_normalized += (float)(Math.Pow(0.2, number_of_cliff_up) * Math.Pow(0.8, number_of_cliff_up));
+                }
+                else
+                {
+                    int number_of_cliff_up = 0;
+                    int number_of_cliff_down = 0;
+                    for (int d = 0; d < scenario.Count; d++)
+                    {
+                        if (scenario[d] == true)
+                        {
+                            number_of_cliff_up++;
+                        }
+                        else
+                        {
+                            number_of_cliff_down++;
+                        }
+                    }
+                    probability_not_cliff_not_normalized += (float)(Math.Pow(0.2, number_of_cliff_up) * Math.Pow(0.8, number_of_cliff_up));
+                }
+            }
+            float alpha = 1 / (probability_not_cliff_not_normalized + probability_cliff_not_normalized);
+            float probability_cliff_normalized = alpha * probability_cliff_not_normalized;
+            float probability_not_cliff_normalized = alpha * probability_not_cliff_not_normalized;
+
+            Console.WriteLine("probability_cliff_normalized : " + probability_cliff_normalized );
+            // Application de la probabilité
+            the_case.Set_Cliff(probability_cliff_normalized);
+        }
+
+        private bool Convert_int_to_bool(int a_value)
+        {
+            return a_value.Equals(1);
+        }
+
+
+        // Fonction permettant de générer des scénarios binaire en fonction du nombre de frontière passé en paramètre
+        public int[] generateAllBinaryStrings(int n,
+                                    int[] arr, int i)
+        {
+            if (i == n)
+            {
+                return arr;
+            }
+
+            arr[i] = 0;
+            generateAllBinaryStrings(n, arr, i + 1);
+
+            arr[i] = 1;
+            generateAllBinaryStrings(n, arr, i + 1);
+
+            return arr;
+        }
     }
 }

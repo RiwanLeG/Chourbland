@@ -63,7 +63,6 @@ namespace Chourbland
         public void Add_Cliff(Case a_cliff)
         {
             _cliff = a_cliff.Get_Cliff() + 0.25f ;
-            /*Update_Image();*/
         }
 
         public float Get_Cliff()
@@ -116,7 +115,6 @@ namespace Chourbland
         {
             _border = is_border;
             Update_Image();
-            Console.WriteLine("Border updated");
         }
         public bool Get_border()
         {
@@ -126,7 +124,7 @@ namespace Chourbland
 
         public void Update_Image()
         {
-            if (_agent == true)
+            if (_agent)
             {
                 image = Chourbland.Resource1.link_static;
             }
@@ -142,11 +140,11 @@ namespace Chourbland
             {
                 image = Chourbland.Resource1.portal;
             }
-            else if (_smell == true)
+            else if (_smell)
             {
                 image = Chourbland.Resource1.poop;
             }
-            else if (_wind == true)
+            else if (_wind)
             {
                 image = Chourbland.Resource1.wind;
             }
