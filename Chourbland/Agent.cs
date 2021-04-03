@@ -20,13 +20,9 @@ namespace Chourbland
         // Intentions - Liste des actions disponibles pour l'agent
         public List<String> intentions = new List<String>(new string[] { "up", "down", "left", "right", "shoot" });
 
-        // Desire - Trouver le portail
-        /*public Object portal_searched = new Object();*/
-        int iteration_number = 0;
-
         private List<int[]> binary_possibility = new List<int[]>();
 
-        //Beliefs
+        // Beliefs
         public Case[,] beliefs = new Case[,] { };
 
         // Position de l'agent
@@ -100,7 +96,7 @@ namespace Chourbland
             return target_pos;
         }
 
-        // On position l'agent
+        // On positionne l'agent
         public void Set_agent_position(Case a_case, Tuple<int, int> agent_position)
         {
             // On lui transmets les informations de la case surlaquelle il se trouve
@@ -182,6 +178,7 @@ namespace Chourbland
             return Tuple.Create(-1, -1);
         }
 
+        // Renvoie true si il est possible de se déplacer dans un endroit sans danger
         public bool Check_possibilities()
         {
             bool is_possibilities = false;
@@ -199,6 +196,7 @@ namespace Chourbland
             return is_possibilities;
         }
 
+        // Fonction de déplacement de l'agent
         public Tuple<int, int> Move_agent()
         {
             // Récompense négative
@@ -274,7 +272,7 @@ namespace Chourbland
         }
 
         // Chainage avant
-        public void Forward_chaining_new_version()
+        public void Expert_system()
         {
             // Récupération de la position actuelle de l'agent ainsi que de sa case
             var x = pos_agent.Item1;
@@ -340,7 +338,6 @@ namespace Chourbland
 
             binary_possibility = new List<int[]>();
 
-            iteration_number = 0;
             // Fonction qui créée tous les scénarios possibles
             an_array = generateAllBinaryStrings(border_cases.Count(), an_array, 0);
 
@@ -503,6 +500,7 @@ namespace Chourbland
         }
 
         // Fonction permettant de générer des scénarios binaire en fonction du nombre de frontière passé en paramètre
+        // Fonction reprise du site https://www.geeksforgeeks.org/generate-all-the-binary-strings-of-n-bits/
         public int[] generateAllBinaryStrings(int n,
                                     int[] arr, int i)
         {

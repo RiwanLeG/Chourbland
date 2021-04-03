@@ -23,15 +23,14 @@ namespace Chourbland
         // Nombre de ligne de la grille
         int line_number = 0;
 
+        // Mesure de performance
         public int score = 0;
+
         // Position actuelle de l'agent
         Tuple<int, int> current_agent_position = Tuple.Create(0, 0);
 
         // Random
         Random random = new Random();
-
-        // Ancienne position de l'agent
-        Tuple<int, int> old_agent_position = Tuple.Create(0,0);
 
         public Form1()
         {
@@ -143,6 +142,7 @@ namespace Chourbland
             }
         }
 
+        // Mise à jour des odeurs et du vent des monstres et des trous
         public void Update_Smell_Wind_and_Light()
         {
             foreach (Case box in cases)
@@ -325,7 +325,7 @@ namespace Chourbland
 
         private void button2_Click(object sender, EventArgs e)
         {
-            the_agent.Forward_chaining_new_version();
+            the_agent.Expert_system();
             Tuple<int, int> smashedcase = the_agent.Consider_shooting_rock();
             Tuple<int, int> error_value = new Tuple<int, int>(-1, -1);
             if (!smashedcase.Equals(error_value))
@@ -342,14 +342,6 @@ namespace Chourbland
             Update_Agent_position(new_agent_position);
             score = the_agent.performance_indicator;
         }
-        
-        // Test de la fonction de récupération du fichier Json
-        private void button7_Click(object sender, EventArgs e)
-        {
-            //Agent the_agent = new Agent(cases.GetLength(0), cases.GetLength(1), cases[current_agent_position.Item1, current_agent_position.Item2], current_agent_position);
-            //the_agent.Load_Json();
-        }
-
         private void Form1_Load(object sender, EventArgs e)
         {
 

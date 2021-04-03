@@ -30,7 +30,6 @@ namespace Chourbland
         {
 
         }
-
         public void Set_Agent(bool is_agent)
         {
             _agent = is_agent;
@@ -154,23 +153,6 @@ namespace Chourbland
             }
             
         }
-
-/*        private bool _agent = false;
-
-        private float _monster = 0f;
-        private bool _smell = false;
-
-        private float _cliff = 0f;
-        private bool _wind = false;
-
-        private float _portal = 0f;
-        private bool _light = false;
-
-        private bool _visited = false;
-
-        private bool _border = false;
-
-        public string Image = " ";*/
 
         public void Display_case()
         {
