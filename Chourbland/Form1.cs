@@ -93,7 +93,7 @@ namespace Chourbland
         }
 
         // Créer une nouvelle grille : agent en position initial (0,0)
-        public void Create_Grid(int a_grid_size)
+        public void Create_Grid(int a_grid_size,int performance)
         {
             line_number = a_grid_size;
 
@@ -106,7 +106,7 @@ namespace Chourbland
             Tuple<int,int> portal_position = Generate_Portal();
 
             // Positionnement de l'agent sur la grille
-            Agent_position_on_the_grid();
+            Agent_position_on_the_grid(performance);
             
             // Pour chaque case : on génère ou non un élément
             for (int k = 0; k < cases.GetLength(0); k++)
@@ -241,24 +241,24 @@ namespace Chourbland
         public Tuple<int,int> Generate_Portal()
         {
             // On génère aléatoirement les coordonnées du portail
-            int portal_x = random.Next(line_number);
-            int portal_y = random.Next(line_number);
+            int portal_x = random.Next(1,line_number);
+            int portal_y = random.Next(1,line_number);
             cases[portal_x, portal_y].Set_Portal(1.0f);
             
             return Tuple.Create(portal_x,portal_y);
         }
 
         // Restart la position de l'agent
-        public void Agent_position_on_the_grid()
+        public void Agent_position_on_the_grid(int performance)
         {
             // Initialisation de l'agent à la case (0,0)
-            the_agent = new Agent(cases.GetLength(0), cases.GetLength(1), cases[current_agent_position.Item1, current_agent_position.Item2], current_agent_position);
+            the_agent = new Agent(cases.GetLength(0), cases.GetLength(1), cases[current_agent_position.Item1, current_agent_position.Item2], current_agent_position,performance);
 
             current_agent_position = Tuple.Create(0, 0);
             cases[current_agent_position.Item1, current_agent_position.Item2].Set_Agent(true);
         }
 
-        private void Update_Agent_position(Tuple<int,int> new_agent_position)
+        private void Update_Agent_position(Tuple<int,int> new_agent_position,int performance)
         {
             // Test de victoire ou de défaite de l'agent
             bool restard_grid = Victory_And_Defeat_Test(new_agent_position);
@@ -268,7 +268,7 @@ namespace Chourbland
             if (restard_grid)
             {
                 current_agent_position = Tuple.Create(0, 0);
-                Create_Grid(grid_size);
+                Create_Grid(grid_size,performance);
             }
             else
             {
@@ -313,10 +313,10 @@ namespace Chourbland
         private void button1_Click(object sender, EventArgs e)
         {
             // Création de la 1ère grille
-            Create_Grid(grid_size);
+            Create_Grid(grid_size,0);
 
             // Test si l'agent spawn sur le portail
-            Update_Agent_position(current_agent_position);
+            Update_Agent_position(current_agent_position,0);
 
             // On dessine la grille
             Draw_Grid();
@@ -333,19 +333,20 @@ namespace Chourbland
                 cases[smashedcase.Item1, smashedcase.Item2].Set_Monster(0f);
                 Update_Smell_Wind_and_Light();
             }
-
+            int performance_agent = the_agent.performance_indicator;
             // Nouvelle position de l'agent
             Tuple<int, int> new_agent_position = the_agent.Move_agent();
 
+
             // Mise à jour graphique et dans le tableau cases de la position de l'agent
-            Update_Agent_position(new_agent_position);
+            Update_Agent_position(new_agent_position, performance_agent);
         }
         
         // Test de la fonction de récupération du fichier Json
         private void button7_Click(object sender, EventArgs e)
         {
-            Agent the_agent = new Agent(cases.GetLength(0), cases.GetLength(1), cases[current_agent_position.Item1, current_agent_position.Item2], current_agent_position);
-            the_agent.Load_Json();
+            //Agent the_agent = new Agent(cases.GetLength(0), cases.GetLength(1), cases[current_agent_position.Item1, current_agent_position.Item2], current_agent_position);
+            //the_agent.Load_Json();
         }
 
         private void Form1_Load(object sender, EventArgs e)
