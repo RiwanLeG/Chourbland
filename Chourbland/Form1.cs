@@ -471,7 +471,7 @@ namespace Chourbland
                         int[] arr = new int[n];
                         the_agent.generateAllBinaryStrings(3 , arr, 0);*/
 
-            the_agent.Apply_proba();
+            /*the_agent.Apply_proba();*/
         }
 
         private void Form1_Load(object sender, EventArgs e)
