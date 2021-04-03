@@ -154,37 +154,5 @@ namespace Chourbland
             }
             
         }
-
-/*        private bool _agent = false;
-
-        private float _monster = 0f;
-        private bool _smell = false;
-
-        private float _cliff = 0f;
-        private bool _wind = false;
-
-        private float _portal = 0f;
-        private bool _light = false;
-
-        private bool _visited = false;
-
-        private bool _border = false;
-
-        public string Image = " ";*/
-
-        public void Display_case()
-        {
-            Console.WriteLine();
-            Console.WriteLine("Agent is here : " + _agent );
-            Console.WriteLine("Monster is here : " + _monster );
-            Console.WriteLine("Cliff is here : " + _cliff );
-            Console.WriteLine("Wind is here : " + _wind );
-            Console.WriteLine("Light is here : " + _light );
-            Console.WriteLine("Smell is here : " + _smell );
-            Console.WriteLine("Border is here : " + _border);
-            Console.WriteLine("The case has been visited : " + _visited);
-            Console.WriteLine("Image : " + image);
-            Console.WriteLine();
-        }
     }
 }
