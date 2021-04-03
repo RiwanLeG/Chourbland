@@ -21,7 +21,10 @@ namespace Chourbland
         public List<String> intentions = new List<String>(new string[] { "up", "down", "left", "right", "shoot" });
 
         // Desire - Trouver le portail
-        public Object portal_searched = new Object();
+        /*public Object portal_searched = new Object();*/
+        int iteration_number = 0;
+
+        private List<int[]> binary_possibility = new List<int[]>();
 
         //Beliefs
         public Case[,] beliefs = new Case[,] { };
@@ -54,7 +57,6 @@ namespace Chourbland
         public void Set_performance_indicator(int value)
         {
             performance_indicator += value;
-            Console.WriteLine("performance_indicator in agent.cs : " + performance_indicator);
         }
 
         public void Shoot_rock(Tuple<int, int> target_pos)
@@ -194,7 +196,6 @@ namespace Chourbland
                     }
                 }
             }
-            Console.WriteLine("is_possibilities" + is_possibilities);
             return is_possibilities;
         }
 
@@ -209,7 +210,6 @@ namespace Chourbland
                 {
                     if (candidate.Get_border())
                     {
-                        Console.WriteLine("Apply_probbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
                         Apply_proba(candidate);
                     }
                 }
@@ -309,6 +309,7 @@ namespace Chourbland
             }
         }
 
+        // Fonction qui calcul les probabilités des cases lorsqu'il est entouré de vent
         public void Apply_proba(Case the_case)
         {
             // Liste des cases vent
@@ -316,6 +317,8 @@ namespace Chourbland
 
             // Liste des case frontières
             List<Tuple<int, int>> border_cases = new List<Tuple<int, int>>();
+
+
             for (int x = 0; x < beliefs.GetLength(0); x++)
             {
                 for (int y = 0; y < beliefs.GetLength(0); y++)
@@ -331,43 +334,34 @@ namespace Chourbland
                 }
             }
 
-            // Liste de scénarios
-            /*List<List<Tuple<bool, Tuple<int, int>>>> scenarios = new List<List<Tuple<bool, Tuple<int, int>>>>();*/
 
+            // Liste de scénarios
             int[] an_array = new int[border_cases.Count()];
 
+            binary_possibility = new List<int[]>();
+
+            iteration_number = 0;
             // Fonction qui créée tous les scénarios possibles
             an_array = generateAllBinaryStrings(border_cases.Count(), an_array, 0);
 
-            int i = 0;
 
             List<List<bool>> several_scenarios = new List<List<bool>>();
             List<bool> a_scenario = new List<bool>();
 
-            foreach (int el in an_array)
-            {
-                if (i < border_cases.Count)
-                {
-                    i++;
-                    a_scenario.Add(Convert_int_to_bool(el));
-                    continue;
-                }
 
+            for(int e=0; e< binary_possibility.Count; e++)
+            {
+                foreach(var eleme in binary_possibility[e])
+                {
+                    a_scenario.Add(Convert_int_to_bool(eleme));
+                }
                 several_scenarios.Add(a_scenario);
                 a_scenario = new List<bool>();
-                i = 0;
-            }
 
-            foreach (var scenario in several_scenarios)
-            {
-                foreach (var el in scenario)
-                {
-                    Console.Write(el + " ");
-                }
-                Console.WriteLine(" ");
             }
 
 
+            // On enlève les scénarios impossible
             foreach (Tuple<int, int> a_case in wind_cases)
             {
 
@@ -380,7 +374,7 @@ namespace Chourbland
                         int y_case = a_case.Item2;
                         if (y_case > 0)
                         {
-                            Tuple<int, int> case_up = Tuple.Create(x_case, y_case - 1);
+                            Tuple<int, int> case_up = Tuple.Create(a_case.Item1, a_case.Item2 - 1);
                             if (case_up.Equals(border_cases[b]) && (several_scenarios[a][b] == true))
                             {
                                 is_there_cliff_near = true;
@@ -389,7 +383,7 @@ namespace Chourbland
 
                         if (y_case < beliefs.GetLength(1))
                         {
-                            Tuple<int, int> case_down = Tuple.Create(x_case, y_case + 1);
+                            Tuple<int, int> case_down = Tuple.Create(a_case.Item1, a_case.Item2 + 1);
                             if (case_down.Equals(border_cases[b]) && (several_scenarios[a][b] == true))
                             {
                                 is_there_cliff_near = true;
@@ -398,7 +392,7 @@ namespace Chourbland
 
                         if (x_case < beliefs.GetLength(0))
                         {
-                            Tuple<int, int> case_right = Tuple.Create(x_case + 1, y_case);
+                            Tuple<int, int> case_right = Tuple.Create(a_case.Item1 + 1, a_case.Item2);
                             if (case_right.Equals(border_cases[b]) && (several_scenarios[a][b] == true))
                             {
                                 is_there_cliff_near = true;
@@ -407,7 +401,7 @@ namespace Chourbland
 
                         if (x_case > 0)
                         {
-                            Tuple<int, int> case_left = Tuple.Create(x_case - 1, y_case);
+                            Tuple<int, int> case_left = Tuple.Create(a_case.Item1 - 1, a_case.Item2);
                             if (case_left.Equals(border_cases[b]) && (several_scenarios[a][b] == true))
                             {
                                 is_there_cliff_near = true;
@@ -424,7 +418,16 @@ namespace Chourbland
                 }
             }
 
-            // Cacul
+            for(int f=0; f< several_scenarios.Count; f++)
+            {
+                for(int g=0; g< several_scenarios[f].Count-1; g++)
+                {
+                    if((several_scenarios[f][g] == false) && several_scenarios[f][g+1] == false)
+                    {
+                        several_scenarios.RemoveAt(f);
+                    }
+                }
+            }
 
             Tuple<int, int> case_coordinate = CoordinatesOf(beliefs, the_case);
 
@@ -438,7 +441,7 @@ namespace Chourbland
                 }
             }
 
-            // Calcul
+            // Calcul de la probabilité
             float probability_cliff_not_normalized = 0f;
             float probability_not_cliff_not_normalized = 0f;
 
@@ -448,7 +451,6 @@ namespace Chourbland
             {
                 if (scenario[index_case] == true)
                 {
-                    Console.WriteLine("Test de passage");
                     int number_of_cliff_up = 0;
                     int number_of_cliff_down = 0;
                     for (int d = 0; d < scenario.Count; d++)
@@ -485,8 +487,12 @@ namespace Chourbland
             float alpha = 1 / (probability_not_cliff_not_normalized + probability_cliff_not_normalized);
             float probability_cliff_normalized = alpha * probability_cliff_not_normalized;
             float probability_not_cliff_normalized = alpha * probability_not_cliff_not_normalized;
-
+            
+            Console.WriteLine();
+            Console.WriteLine("case_coordinate : " + case_coordinate);
             Console.WriteLine("probability_cliff_normalized : " + probability_cliff_normalized );
+            Console.WriteLine("probability_not_cliff_normalized : " + probability_not_cliff_normalized);
+            
             // Application de la probabilité
             the_case.Set_Cliff(probability_cliff_normalized);
         }
@@ -496,13 +502,13 @@ namespace Chourbland
             return a_value.Equals(1);
         }
 
-
         // Fonction permettant de générer des scénarios binaire en fonction du nombre de frontière passé en paramètre
         public int[] generateAllBinaryStrings(int n,
                                     int[] arr, int i)
         {
             if (i == n)
             {
+                binary_possibility.Add(arr.ToArray());
                 return arr;
             }
 
