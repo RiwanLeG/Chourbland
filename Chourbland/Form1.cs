@@ -67,7 +67,7 @@ namespace Chourbland
             float y = 0f;
 
             // Taille des case
-            float size = (float)(100/cases.GetLength(0));
+            float size = (float)(600/cases.GetLength(0));
 
             // lignes verticales
             for (int i = 0; i < cases.GetLength(0) +1; i++)
@@ -341,6 +341,7 @@ namespace Chourbland
             // Mise à jour graphique et dans le tableau cases de la position de l'agent
             Update_Agent_position(new_agent_position);
             score = the_agent.performance_indicator;
+            label2.Text = score.ToString();
         }
         
         // Test de la fonction de récupération du fichier Json
@@ -353,6 +354,11 @@ namespace Chourbland
         private void Form1_Load(object sender, EventArgs e)
         {
 
+        }
+
+        private void label2_Click(object sender, EventArgs e)
+        {
+            
         }
     }
 }
