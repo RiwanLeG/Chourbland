@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,7 +24,7 @@ namespace Chourbland
 
         private bool _border = false;
 
-        public string Image = " ";
+        public Image image;
 
         public Case()
         {
@@ -127,35 +128,31 @@ namespace Chourbland
         {
             if (_agent == true)
             {
-                Image = "a";
+                image = Chourbland.Resource1.link_static;
             }
             else if (_monster == 1.0f)
             {
-                Image = "m";
+                image = Chourbland.Resource1.suli;
             }
             else if (_cliff == 1.0f)
             {
-                Image = "c";
+                image = Chourbland.Resource1.cliff;
             }
             else if (_portal == 1.0f)
             {
-                Image = "p";
+                image = Chourbland.Resource1.portal;
             }
             else if (_smell == true)
             {
-                Image = "s";
+                image = Chourbland.Resource1.poop;
             }
             else if (_wind == true)
             {
-                Image = "w";
-            }
-            else if (_light == true)
-            {
-                Image = "l";
+                image = Chourbland.Resource1.wind;
             }
             else
             {
-                Image = " ";
+                image = Chourbland.Resource1.back;
             }
             
         }
@@ -188,7 +185,7 @@ namespace Chourbland
             Console.WriteLine("Smell is here : " + _smell );
             Console.WriteLine("Border is here : " + _border);
             Console.WriteLine("The case has been visited : " + _visited);
-            Console.WriteLine("Image : " + Image);
+            Console.WriteLine("Image : " + image);
             Console.WriteLine();
         }
     }

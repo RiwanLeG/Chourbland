@@ -62,9 +62,9 @@ namespace Chourbland
 
             // Création de la grille visuelle
             Graphics graphic = grid.CreateGraphics();
-            Pen effective_pen = new Pen(Brushes.Black, 1);
-            Pen pen = new Pen(Brushes.Black, 1);
-            Pen grass_pen = new Pen(Brushes.Black, 3);
+            Pen effective_pen = new Pen(Brushes.LightGreen, 3);
+            Pen pen = new Pen(Brushes.LightGreen, 1);
+            Pen grass_pen = new Pen(Brushes.LightGreen, 3);
             Font font = new Font("Arial", 10);
 
 
@@ -73,7 +73,7 @@ namespace Chourbland
             float y = 0f;
 
             // Taille des case
-            float size = (float)(100/cases.GetLength(0));
+            float size = (float)(300/cases.GetLength(0));
 
             // lignes verticales
             /*for (int i = 0; i < line_number; i++)*/
@@ -97,7 +97,7 @@ namespace Chourbland
             {
                 for (int n = 0; n < cases.GetLength(1); n++)
                 {
-                    graphic.DrawString(cases[k, n].Image.ToString(), font, Brushes.Black, k * size, n * size);
+                    graphic.DrawImage(cases[k, n].image, k * size, n * size, size-1, size-1);
                 }
             }
         }
@@ -242,6 +242,7 @@ namespace Chourbland
                     {
                         for (int dy = -1; dy <= 1; ++dy)
                         {
+                            cases[box_pos.Item1, box_pos.Item2].Set_Light(true);
                             int xdx = box_pos.Item1 + dx;
                             int ydy = box_pos.Item2 + dy;
                             //On vérifie bien qu'on ne sort pas de la grille
@@ -249,12 +250,6 @@ namespace Chourbland
                                 (ydy > cases.GetLength(1) - 1))
                             {
                                 continue;
-                            }
-
-                            if (((dx != 0 && dy == 0) || (dx == 0 && dy != 0)))
-                            {
-                                cases[xdx, ydy].Set_Light(true);
-
                             }
                         }
                     }
