@@ -44,9 +44,9 @@ namespace Chourbland
             Update_Image();
         }
 
-        public void Add_Monster(float a_monster)
+        public void Add_Monster(Case a_monster)
         {
-            _monster = a_monster + 0.25f;
+            _monster = a_monster.Get_Monster() + 0.25f;
             Update_Image();
         }
         public float Get_Monster()
@@ -59,19 +59,10 @@ namespace Chourbland
             Update_Image();
         }
 
-        public void Add_Cliff(float a_cliff)
+        public void Add_Cliff(Case a_cliff)
         {
-            _cliff = a_cliff + 0.25f ;
-            /*Update_Image();*/
+            _cliff = a_cliff.Get_Cliff() + 0.25f ;
         }
-
-
-        public void Substract_cliff(float value)
-        {
-            _cliff += value;
-            /*Update_Image();*/
-        }
-
 
         public float Get_Cliff()
         {
@@ -123,7 +114,6 @@ namespace Chourbland
         {
             _border = is_border;
             Update_Image();
-            Console.WriteLine("Border updated");
         }
         public bool Get_border()
         {
@@ -133,7 +123,7 @@ namespace Chourbland
 
         public void Update_Image()
         {
-            if (_agent == true)
+            if (_agent)
             {
                 Image = "a";
             }
@@ -149,15 +139,15 @@ namespace Chourbland
             {
                 Image = "p";
             }
-            else if (_smell == true)
+            else if (_smell)
             {
                 Image = "s";
             }
-            else if (_wind == true)
+            else if (_wind)
             {
                 Image = "w";
             }
-            else if (_light == true)
+            else if (_light)
             {
                 Image = "l";
             }
@@ -167,37 +157,6 @@ namespace Chourbland
             }
             
         }
-
-/*        private bool _agent = false;
-
-        private float _monster = 0f;
-        private bool _smell = false;
-
-        private float _cliff = 0f;
-        private bool _wind = false;
-
-        private float _portal = 0f;
-        private bool _light = false;
-
-        private bool _visited = false;
-
-        private bool _border = false;
-
-        public string Image = " ";*/
-
-        public void Display_case()
-        {
-            Console.WriteLine();
-            Console.WriteLine("Agent is here : " + _agent );
-            Console.WriteLine("Monster is here : " + _monster );
-            Console.WriteLine("Cliff is here : " + _cliff );
-            Console.WriteLine("Wind is here : " + _wind );
-            Console.WriteLine("Light is here : " + _light );
-            Console.WriteLine("Smell is here : " + _smell );
-            Console.WriteLine("Border is here : " + _border);
-            Console.WriteLine("The case has been visited : " + _visited);
-            Console.WriteLine("Image : " + Image);
-            Console.WriteLine();
-        }
+        
     }
 }
